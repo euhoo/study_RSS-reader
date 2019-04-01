@@ -1,6 +1,3 @@
-import './styles.scss'; // подключаю стили.
-// import 'bootstrap/dist/css/bootstrap.min.css';
-import './bootstrap/bootstrap';
 import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 
