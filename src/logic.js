@@ -14,7 +14,8 @@ export default () => {
       .then(({ data }) => {
         const document = parser.parseFromString(data, 'application/xml');
         console.log(document);
-      });
+      })
+      .catch(() => console.log('error mazafaka'));
   });
 };
 /*
