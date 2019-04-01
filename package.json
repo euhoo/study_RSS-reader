@@ -11,10 +11,12 @@
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
+    "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
     "cssnano": "^4.1.10",
     "jquery": "^3.3.1",
-    "popper.js": "^1.14.7"
+    "popper.js": "^1.14.7",
+    "validator": "^10.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
