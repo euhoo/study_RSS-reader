@@ -3,9 +3,7 @@
   "version": "0.0.1",
   "description": "it's a rss-reader",
   "scripts": {
-    "build": "webpack",
-    "watch": "webpack --watch",
-    "start": "webpack-dev-server --open"
+    "webpack": "webpack"
   },
   "author": "Evgeniy Kvach",
   "license": "ISC",

@@ -1,14 +1,15 @@
 install:
 	npm install
 
-build:
-	npm run build
-
-watch:
-	npm run watch
-
 start:
-	npm start
+	npx webpack-dev-server --open
+
+build:
+	rm -rf dist
+	NODE_ENV=production npx webpack
+
+publish:
+	npm publish
 
 lint:
 	npx eslint .

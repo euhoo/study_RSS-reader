@@ -1,11 +1,11 @@
-import isURL from 'validator/lib/isURL';
+// import isURL from 'validator/lib/isURL';
 import axios from 'axios';
 
 // import rss from './rss';
 // import { promises } from 'fs';
 const input = document.querySelector('input');
 const rss = (inp) => {
-  const state = { rss: '' };
+  // const state = { rss: '' };
   inp.addEventListener('input', ({ target }) => {
     const parser = new DOMParser();
     axios.get(target.value)
