@@ -6,8 +6,6 @@ import { cleanClassList, setFrameColor } from './utils';
 /*
 поправить
 
-2.чтобы рамка при пустом поле была нейтральная
-
 4.разнести все по своим файлам
 5.очистка поля после нажатия
 
@@ -57,7 +55,11 @@ export default () => {
     addingFunc();
     const parser = new DOMParser();
     const link = state.value;
-    button.setAttribute('placeholder', 'Search');
+
+    // input.value = '';
+    // state.buttonState = '';
+    // setFrameColor(state);
+    console.log(input);
     const cors = 'https://cors-anywhere.herokuapp.com/';
     axios.get(`${cors}${link}`)
       .then(({ data }) => {
@@ -72,8 +74,7 @@ export default () => {
         state.allRss = [state.currentRss, ...state.allRss];
       })
 
-      .catch((data) => {
-        console.log(data);
+      .catch(() => {
         state.error = true;
       });
   });
