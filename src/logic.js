@@ -5,9 +5,9 @@ import { cleanClassList, setFrameColor } from './utils';
 
 /*
 поправить
-1.Чтобы в поле ввода остался один крестик
+
 2.чтобы рамка при пустом поле была нейтральная
-3.дубляж
+
 4.разнести все по своим файлам
 
 
@@ -18,7 +18,6 @@ const { watch } = WatchJS;
 export default () => {
 /*     model     */
   const state = {
-    link: {},
     value: false, // когда начинаем вводить становится true. когда ячейка пуста-вновь false
     correctUrl: true, // false
     error: false, // true здесь мы следим,если введенная ссылка-не rss поток
@@ -33,6 +32,18 @@ export default () => {
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
 
+  const buttonStateFunc = () => {
+    // eslint-disable-next-line no-unused-expressions
+    button.hasAttribute('disabled') ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
+  };
+
+  const addingFunc = () => {
+    buttonStateFunc();
+    window.setTimeout(() => {
+      buttonStateFunc();
+    }, 3000);
+  };
+
 
   input.addEventListener('input', ({ target }) => {
     state.value = target.value;
@@ -42,6 +53,7 @@ export default () => {
   });
 
   button.addEventListener('click', () => {
+    addingFunc();
     const parser = new DOMParser();
     const link = state.value;
     button.setAttribute('placeholder', 'Search');
@@ -57,20 +69,14 @@ export default () => {
           value: state.value,
         };
         state.allRss = [state.currentRss, ...state.allRss];
-        console.log(state.currentRss);
       })
 
-      .catch(() => {
+      .catch((data) => {
+        console.log(data);
         state.error = true;
-        console.log(state.error);
       });
   });
 
-
-  const buttonStateFunc = () => {
-  // eslint-disable-next-line no-unused-expressions
-    button.hasAttribute('disabled') ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
-  };
 
   const errorFunc = () => {
     if (state.error === false) return;
@@ -82,6 +88,20 @@ export default () => {
     state.error = false;
   };
 
+  const addFunc = () => {
+    const errorDiv = document.querySelector('#added');
+    errorDiv.setAttribute('style', 'display:block;');
+    window.setTimeout(() => {
+      errorDiv.setAttribute('style', 'display:none;');
+    }, 1000);
+  };
+  const alreadyHaveFunc = () => {
+    const errorDiv = document.querySelector('#have');
+    errorDiv.setAttribute('style', 'display:block;');
+    window.setTimeout(() => {
+      errorDiv.setAttribute('style', 'display:none;');
+    }, 1000);
+  };
 
   /*  view  */
 
@@ -92,6 +112,14 @@ export default () => {
   };
 
   const renderRss = () => {
+    // есть ли в state.allRss ссылка. если да-return
+    const arr = state.allRss;
+    const filtered = arr.filter(item => item === state.value);
+    if (filtered.length > 0) {
+      alreadyHaveFunc();
+      return;
+    }
+    state.allRss = [state.value, ...state.allRss];
     const forRss = document.querySelector('#rss');
     const rssObj = state.currentRss;
     const rssParser = new DOMParser();
@@ -119,7 +147,7 @@ export default () => {
       div.append(a);
       divRss.append(div);
     });
-    console.log(doc);
+    addFunc();
     forRss.appendChild(top);
   };
 
