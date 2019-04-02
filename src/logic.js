@@ -1,35 +1,50 @@
+import WatchJS from 'melanke-watchjs';
+import $ from 'jquery';
+import isURL from 'validator/lib/isURL';
 import axios from 'axios';
-// import isURL from 'validator/lib/isURL';
-// import WatchJS from 'melanke-watchjs';
+import { cleanClassList, setFrameColor } from './utils';
 
+const { watch } = WatchJS;
+/*     model     */
+const state = {
+  link: {},
+  value: false, // когда начинаем вводить становится true. когда ячейка пуста-вновь false
+  correctUrl: true, // false
+  error: false, // true здесь мы следим,если введенная ссылка-не rss поток
+  errorShown: true, // показывает,показало ли ошибку
+  buttonState: false, // true - отсюда буду брать свойство-активна кнопка или нет
+  inputFrame: 'none', // none/red/green-отсюда вотчим рамку
+  currentRss: {}, // текущий rss
+  allRss: [],
+};
+const input = document.querySelector('#main-input');
+const button = document.querySelector('#main-button');
 
-// const { watch } = WatchJS;
-const input = document.querySelector('input');
+/*     controller      */
+
 export default () => {
   input.addEventListener('input', ({ target }) => {
-    const parser = new DOMParser();
-    const link = target.value;
-    const cors = 'https://cors-anywhere.herokuapp.com/';
-    axios.get(`${cors}${link}`)
-      .then(({ data }) => {
-        const document = parser.parseFromString(data, 'application/xml');
-        console.log(document);
-      })
-      .catch(() => console.log('error mazafaka'));
+    state.value = (target.value.length > 0);
+    state.correctUrl = isURL(target.value);
+    state.buttonState = (state.value && state.correctUrl);
+    console.log(state.buttonState);
+    state.inputFrame = setFrameColor(state);
   });
 };
-/*
-watch(state, 'error', () => {
-  console.log('error mazafaka');
-});
-watch(state, 'link', () => {
-  console.log('error mazafaka');
-});
 
-const state = {
-  title: [],
-  content: [],
-  error: '',
-  link: '',
+const buttonStateFunc = () => {
+  // eslint-disable-next-line no-unused-expressions
+  button.hasAttribute('disabled') ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
 };
-*/
+
+
+/*  view  */
+
+
+const inputFrameFunc = (st) => {
+  cleanClassList(input.classList);
+  if (st.inputFrame.length > 0) input.classList.add(st.inputFrame);
+};
+
+watch(state, 'inputFrame', () => inputFrameFunc(state)); // готово
+watch(state, 'buttonState', buttonStateFunc);
