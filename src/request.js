@@ -8,7 +8,7 @@ const whenLoading = () => {
   const tag = `
   <div class="row no-gutters">
    <div class="col-12 col-xs-12 col-sm-12 col-md-9 col-lg-10">
-     <div> <p style="color:green;">Добавляю элемент...</p></div>
+     <div> <p style="color:green;">Please, wait! I'm in process!</p></div>
    </div>
  </div>`;
   const div = document.createElement('div');
