@@ -4,14 +4,6 @@ import WatchJS from 'melanke-watchjs';
 import isURL from 'validator/lib/isURL';
 import makeRequest from './request';
 
-/*
-поправить
-
-4.разнести все по своим файлам
-5.очистка поля после нажатия
-6.добавить по событию нажатию на enter
-
-*/
 const cleanClassList = (cl) => {
   cl.remove('is-valid');
   cl.remove('is-invalid');
@@ -20,37 +12,28 @@ const cleanClassList = (cl) => {
 const setFrameColor = (st) => {
   let color = 'is-valid';
   if (st.value.length === 0) color = '';
-  else if (st.correctUrl === false) color = 'is-invalid';
+  else if (isURL(st.value) === false) color = 'is-invalid';
   return color;
 };
+
 const { watch } = WatchJS;
 
 export default () => {
-/*     model     */
   const state = {
     value: '',
-    correctUrl: true,
-    buttonState: 'disabled',
     inputFrame: 'none',
     error: '',
-    currentRss: {}, // текущий rss
-    allRss: [], // все ссылки на все rss страницы
+    currentRss: {},
+    allRss: [],
   };
-
-  /*     controller      */
 
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
   const errorTag = document.querySelector('#error');
 
-  const buttonStateFunc = () => {
-    button.hasAttribute('disabled') ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
-  };
-
   input.addEventListener('input', ({ target }) => {
     state.value = target.value;
-    state.correctUrl = isURL(target.value);
-    state.buttonState = (state.value.length > 0 && state.correctUrl) ? 'enabled' : 'disabled';
+    (state.value.length > 0 && isURL(state.value)) ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
     state.inputFrame = setFrameColor(state);
   });
 
@@ -63,12 +46,10 @@ export default () => {
     makeRequest(url, state);
   });
 
-  const inputFrameFunc = (st) => {
+  const inputFrameState = () => {
     cleanClassList(input.classList);
-    if (st.inputFrame.length > 0) input.classList.add(st.inputFrame);
+    if (state.inputFrame.length > 0) input.classList.add(state.inputFrame);
   };
-
-  /*  view  */
 
   const renderError = () => {
     if (state.error.length === 0) return;
@@ -119,8 +100,7 @@ export default () => {
     document.querySelector('#rss').appendChild(div);
   };
 
-  watch(state, 'inputFrame', () => inputFrameFunc(state));
-  watch(state, 'buttonState', buttonStateFunc);
+  watch(state, 'inputFrame', () => inputFrameState());
   watch(state, 'error', renderError);
   watch(state, 'currentRss', renderRss);
 };

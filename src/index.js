@@ -1,5 +1,5 @@
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import logic from './logic';
+import app from './app';
 
-logic();
+app();
