@@ -16,7 +16,7 @@ export default (url, stateObj) => {
       };
       stateObj.allRss = [stateObj.currentRss, ...stateObj.allRss];
     })
-    .catch(() => {
-      stateObj.error = true;
+    .catch((data) => {
+      stateObj.error = data;
     });
 };

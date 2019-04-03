@@ -3,7 +3,6 @@
 import WatchJS from 'melanke-watchjs';
 import isURL from 'validator/lib/isURL';
 import makeRequest from './request';
-import { cleanClassList, makeTemporyVisible } from './utils';
 
 /*
 поправить
@@ -13,6 +12,11 @@ import { cleanClassList, makeTemporyVisible } from './utils';
 6.добавить по событию нажатию на enter
 
 */
+const cleanClassList = (cl) => {
+  cl.remove('is-valid');
+  cl.remove('is-invalid');
+};
+
 const setFrameColor = (st) => {
   let color = 'is-valid';
   if (st.value.length === 0) color = '';
@@ -24,11 +28,11 @@ const { watch } = WatchJS;
 export default () => {
 /*     model     */
   const state = {
-    value: false, // когда начинаем вводить становится true. когда ячейка пуста-вновь false
-    correctUrl: true, // false
-    error: false, // true здесь мы следим,если введенная ссылка-не rss поток
-    buttonState: false, // true - отсюда буду брать свойство-активна кнопка или нет
-    inputFrame: 'none', // none/red/green-отсюда вотчим рамку
+    value: '',
+    correctUrl: true,
+    buttonState: 'disabled',
+    inputFrame: 'none',
+    error: '',
     currentRss: {}, // текущий rss
     allRss: [], // все ссылки на все rss страницы
   };
@@ -37,23 +41,16 @@ export default () => {
 
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
+  const errorTag = document.querySelector('#error');
 
   const buttonStateFunc = () => {
     button.hasAttribute('disabled') ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
   };
 
-  const makeButtonTemporalBlocked = (delay) => {
-    buttonStateFunc();
-    window.setTimeout(() => {
-      buttonStateFunc();
-    }, delay);
-  };
-
-
   input.addEventListener('input', ({ target }) => {
     state.value = target.value;
     state.correctUrl = isURL(target.value);
-    state.buttonState = (state.value.length > 0 && state.correctUrl);
+    state.buttonState = (state.value.length > 0 && state.correctUrl) ? 'enabled' : 'disabled';
     state.inputFrame = setFrameColor(state);
   });
 
@@ -66,23 +63,34 @@ export default () => {
     makeRequest(url, state);
   });
 
-  const errorStateFunc = () => {
-    if (state.error === false) return;
-    makeTemporyVisible('#error', 3000);
-    state.error = false;
-    makeButtonTemporalBlocked(2000);
-  };
-
-  /*  view  */
-
   const inputFrameFunc = (st) => {
     cleanClassList(input.classList);
     if (st.inputFrame.length > 0) input.classList.add(st.inputFrame);
   };
+
+  /*  view  */
+
+  const renderError = () => {
+    if (state.error.length === 0) return;
+    const error = `
+    <div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span></button>
+        Произошла ошибка!
+</div> `;
+    const div = document.createElement('div');
+    div.innerHTML = error;
+    errorTag.appendChild(div);
+    state.error = '';
+    setTimeout(() => {
+      errorTag.innerHTML = '';
+    }, 3000);
+  };
+
+
   const renderRss = () => {
     const filtered = state.allRss.filter(item => item === state.value);
     if (filtered.length > 0) {
-      makeTemporyVisible('#have', 1000);
       return;
     }
 
@@ -109,11 +117,10 @@ export default () => {
         </div>
       </div>`;
     document.querySelector('#rss').appendChild(div);
-    makeTemporyVisible('#added', 1000);
   };
 
   watch(state, 'inputFrame', () => inputFrameFunc(state));
   watch(state, 'buttonState', buttonStateFunc);
-  watch(state, 'error', errorStateFunc);
+  watch(state, 'error', renderError);
   watch(state, 'currentRss', renderRss);
 };
