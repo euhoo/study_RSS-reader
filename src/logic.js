@@ -3,7 +3,7 @@
 import WatchJS from 'melanke-watchjs';
 import isURL from 'validator/lib/isURL';
 import makeRequest from './request';
-import { cleanClassList, setFrameColor, makeTemporyVisible } from './utils';
+import { cleanClassList, makeTemporyVisible } from './utils';
 
 /*
 поправить
@@ -13,7 +13,12 @@ import { cleanClassList, setFrameColor, makeTemporyVisible } from './utils';
 6.добавить по событию нажатию на enter
 
 */
-
+const setFrameColor = (st) => {
+  let color = 'is-valid';
+  if (st.value.length === 0) color = '';
+  else if (st.correctUrl === false) color = 'is-invalid';
+  return color;
+};
 const { watch } = WatchJS;
 
 export default () => {
@@ -53,8 +58,9 @@ export default () => {
   });
 
   button.addEventListener('click', () => {
-    makeButtonTemporalBlocked(2000);
     const link = state.value;
+    input.value = '';
+    state.inputFrame = 'none';
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
     makeRequest(url, state);
@@ -64,6 +70,7 @@ export default () => {
     if (state.error === false) return;
     makeTemporyVisible('#error', 3000);
     state.error = false;
+    makeButtonTemporalBlocked(2000);
   };
 
   /*  view  */
