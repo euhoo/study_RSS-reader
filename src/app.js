@@ -68,7 +68,6 @@ export default () => {
     }, 3000);
   };
 
-
   const renderRss = () => {
     const filtered = state.allRss.filter(item => item === state.value);
     if (filtered.length > 0) {
