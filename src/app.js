@@ -21,8 +21,6 @@ export default () => {
 
   addListeners(input, state, button);
 
-  /*      view    */
-
   const stateEvents = {
     init: () => {
       input.value = '';
@@ -58,7 +56,7 @@ export default () => {
 
   };
 
-  const feedState = () => {
+  const addRss = () => {
     const result = [];
     const feed = state.currentFeed;
     feed.items.forEach((item, index) => {
@@ -79,5 +77,5 @@ export default () => {
   };
 
   watch(state, 'process', () => stateEvents[state.process]());
-  watch(state, 'currentFeed', feedState);
+  watch(state, 'currentFeed', addRss);
 };
