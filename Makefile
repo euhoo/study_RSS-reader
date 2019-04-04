@@ -2,7 +2,7 @@ install:
 	npm install
 
 start:
-	npx webpack-dev-server --open
+	npm start
 
 build:
 	rm -rf dist

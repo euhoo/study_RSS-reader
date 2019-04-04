@@ -1,58 +1,70 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-param-reassign */
 import WatchJS from 'melanke-watchjs';
+import axios from 'axios';
 import isURL from 'validator/lib/isURL';
-import makeRequest from './request';
-
-const cleanClassList = (cl) => {
-  cl.remove('is-valid');
-  cl.remove('is-invalid');
-};
-
-const setFrameColor = (st) => {
-  let color = 'is-valid';
-  if (st.value.length === 0) color = '';
-  else if (isURL(st.value) === false) color = 'is-invalid';
-  return color;
-};
-
-const { watch } = WatchJS;
 
 export default () => {
-  const state = {
-    value: '',
-    inputFrame: 'none',
-    error: '',
-    currentRss: {},
-    allRss: [],
-  };
-
+  const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
   const errorTag = document.querySelector('#error');
 
+  const state = {
+    process: 'init', // invalid, loading, error, duplicate, valid
+    feedslist: [],
+    currentFeed: {},
+    value: '',
+  };
+
+
+  const getFeed = (url, stateObj) => {
+    const parser = new DOMParser();
+    axios.get(url)
+      .then(({ data }) => {
+        state.process = 'init';
+        const doc = parser.parseFromString(data, 'application/xml');
+        const title = doc.querySelector('title').textContent;
+        const items = [...doc.querySelectorAll('item')];
+        /* добавляю ссылку именно здесь,т.к. здесь мы появляемся,только если ссылка - rss */
+        stateObj.feedslist = [...stateObj.feedslist, url];
+        stateObj.currentFeed = {
+          title,
+          items,
+        };
+      })
+      .catch(() => {
+        state.process = 'error';// написать функцию,которая возвращает ошибку
+        setTimeout(() => {
+          state.process = 'init';// написать функцию,которая возвращает ошибку
+        }, 3000);
+      });
+  };
+
   input.addEventListener('input', ({ target }) => {
     state.value = target.value;
-    (state.value.length > 0 && isURL(state.value)) ? button.removeAttribute('disabled') : button.setAttribute('disabled', 'disabled');
-    state.inputFrame = setFrameColor(state);
+    if (state.value.length === 0) state.process = 'init';
+    else state.process = isURL(state.value) ? 'valid' : 'invalid';
   });
 
   button.addEventListener('click', () => {
+    state.process = 'loading';
     const link = state.value;
     input.value = '';
     state.inputFrame = 'none';
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
-    makeRequest(url, state);
+    const filtered = state.feedslist.filter(item => item === url);
+    if (filtered.length === 0) getFeed(url, state);
+    else {
+        state.process = 'duplicate';// написать функцию,которая возвращает ошибку
+    }
   });
 
-  const inputFrameState = () => {
-    cleanClassList(input.classList);
-    if (state.inputFrame.length > 0) input.classList.add(state.inputFrame);
-  };
 
-  const renderError = () => {
-    if (state.error.length === 0) return;
+  /*      view    */
+
+  const whenError = () => {
     const error = `
     <div class="alert alert-danger alert-dismissible" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -62,44 +74,64 @@ export default () => {
     const div = document.createElement('div');
     div.innerHTML = error;
     errorTag.appendChild(div);
-    state.error = '';
     setTimeout(() => {
       errorTag.innerHTML = '';
     }, 3000);
   };
 
-  const renderRss = () => {
-    const filtered = state.allRss.filter(item => item === state.value);
-    if (filtered.length > 0) {
-      return;
-    }
+  const processState = () => {
+    switch (state.process) {
+      case 'init':
+        // button.setAttribute('disabled', 'disabled');
+        button.removeAttribute('disabled');
+        input.classList.add('none');
+        input.classList.remove('is-valid', 'is-invalid');
+        input.removeAttribute('readonly', 'readonly');
+        // форму очистить
+        break;
 
-    state.allRss = [state.value, ...state.allRss];
-    const rssObj = state.currentRss;
-    const res = [];
-    rssObj.items.forEach((item) => {
-      const feedStr = `
-      <li class="col-12">
-        <a href="${item.querySelector('link').textContent}">
-          ${item.querySelector('title').textContent}
-        </a>
-      </li>`;
-      res.push(feedStr);
-    });
-    const div = document.createElement('div');
-    div.innerHTML = `
-      <div class="row no-gutters">
-        <div  class="col-12">
-          <h2 id="title">${rssObj.title}</h2>
-        </div>
-        <div class="col-12">
-          ${res.join('')}
-        </div>
-      </div>`;
-    document.querySelector('#rss').appendChild(div);
+      case 'invalid':
+        button.setAttribute('disabled', 'disabled');
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+        break;
+
+      case 'valid':
+        button.removeAttribute('disabled');
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        break;
+
+      case 'loading':
+        button.setAttribute('disabled', 'disabled');
+        input.classList.remove('is-valid', 'is-invalid');
+        input.classList.add('none');
+        input.setAttribute('readonly', 'readonly');
+        // добавить колесико прокрутки
+        break;
+
+      case 'duplicate':
+        button.removeAttribute('disabled');
+        input.classList.add('none');
+        input.classList.remove('is-valid', 'is-invalid');
+        input.removeAttribute('readonly', 'readonly');
+        console.log(state.feedslist);
+        // рамку подсветить желтым
+
+        break;
+
+      case 'error':// если ссылка вернула ошибку
+        button.removeAttribute('disabled');
+        input.classList.add('none');
+        input.classList.remove('is-valid', 'is-invalid');
+        input.removeAttribute('readonly', 'readonly');
+        whenError();
+
+        break;
+      default:
+        break;
+    }
   };
 
-  watch(state, 'inputFrame', () => inputFrameState());
-  watch(state, 'error', renderError);
-  watch(state, 'currentRss', renderRss);
+  watch(state, 'process', processState);
 };
