@@ -6,7 +6,7 @@ export default () => {
   const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
-  const errorTag = document.querySelector('#error');
+  const errorTag = document.querySelector('#danger');
   const successTag = document.querySelector('#success');
 
   const state = {
@@ -63,31 +63,17 @@ export default () => {
 
   /*      view    */
 
-  const whenError = () => {
-    const error = `
-    <div class="alert alert-danger alert-dismissible" role="alert">
+  const eventLoader = (event, message) => {
+    const parent = document.querySelector(`#${event}`);
+    const tag = `
+    <div class="alert alert-${event} alert-dismissible" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span></button>
-        Error! Address is not RSS or link is not correct!
+        ${message}
 </div> `;
     const div = document.createElement('div');
-    div.innerHTML = error;
-    errorTag.appendChild(div);
-    setTimeout(() => {
-      errorTag.innerHTML = '';
-    }, 3000);
-  };
-
-  const whenSuccess = () => {
-    const success = `
-    <div class="alert alert-success alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span></button>
-        Loading...
-</div> `;
-    const div = document.createElement('div');
-    div.innerHTML = success;
-    successTag.appendChild(div);
+    div.innerHTML = tag;
+    parent.appendChild(div);
   };
 
   const processState = () => {
@@ -119,7 +105,7 @@ export default () => {
         input.classList.remove('is-valid', 'is-invalid');
         input.classList.add('none');
         input.setAttribute('readonly', 'readonly');
-        whenSuccess();
+        eventLoader('success', 'Loading...');
         break;
 
       case 'duplicate':
@@ -136,7 +122,10 @@ export default () => {
         input.classList.remove('is-valid', 'is-invalid');
         input.removeAttribute('readonly', 'readonly');
         successTag.innerHTML = '';
-        whenError();
+        eventLoader('danger', 'Error! Address is not RSS or link is not correct!');
+        setTimeout(() => {
+          errorTag.innerHTML = '';
+        }, 3000);
 
         break;
       default:
