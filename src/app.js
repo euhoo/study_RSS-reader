@@ -1,6 +1,7 @@
 import WatchJS from 'melanke-watchjs';
 import axios from 'axios';
 import isURL from 'validator/lib/isURL';
+// import makeModalWindow from './modal';
 
 export default () => {
   const { watch } = WatchJS;
@@ -16,7 +17,6 @@ export default () => {
     value: '',
     currendFeed: {},
   };
-
 
   const getFeed = (url, stateObj) => {
     const parser = new DOMParser();
@@ -46,7 +46,7 @@ export default () => {
   button.addEventListener('click', () => {
     state.process = 'loading';
     const link = state.value;
-    
+
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
     const filtered = state.feedLinks.filter(item => item === url);
@@ -55,7 +55,6 @@ export default () => {
       state.process = 'duplicate';
     }
   });
-
 
   /*      view    */
 
