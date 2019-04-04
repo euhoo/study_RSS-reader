@@ -3,14 +3,17 @@
 // const id = title.split(' ').join('').substr(5, 12);
 // const clearId = id.replace(/[.,\/#!$%\^&\*;:'’{}=\-_`~()]/g, '');
 // console.log(result);
-
+/*
 export default (item) => {
   const title = item.querySelector('title').textContent;
   // const href = item.querySelector('link').textContent;
   //  const id = title.split(' ').join('').substr(5, 12);
   // const clearId = id.replace(/[.,/#!$%^&*;:'’{}=\-_`~()]/g, '');
+  // const button = `<a href="#" class="nav-link" data-toggle="modal"
+  data-target="#modalWindow">${href}</a>`;
   return `
-      <div class="modal fade" id="modalWindow" tabindex="-1" role="dialog" aria-labelledby="modalWindow"
+      <div class="modal fade" id="modalWindow" tabindex="-1" role="dialog"
+      aria-labelledby="modalWindow"
       aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -28,3 +31,4 @@ export default (item) => {
       </div>
   </div>`;
 };
+*/
