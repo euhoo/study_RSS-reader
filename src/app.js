@@ -9,11 +9,12 @@ export default () => {
   const input = document.querySelector('#main-input');
   const button = document.querySelector('#main-button');
   const errorTag = document.querySelector('#error');
+  const successTag = document.querySelector('#success');
 
   const state = {
     process: 'init', // invalid, loading, error, duplicate, valid
-    feedslist: [],
-    currentFeed: {},
+    feedLinks: [],
+    feeds: [],
     value: '',
   };
 
@@ -27,11 +28,8 @@ export default () => {
         const title = doc.querySelector('title').textContent;
         const items = [...doc.querySelectorAll('item')];
         /* добавляю ссылку именно здесь,т.к. здесь мы появляемся,только если ссылка - rss */
-        stateObj.feedslist = [...stateObj.feedslist, url];
-        stateObj.currentFeed = {
-          title,
-          items,
-        };
+        stateObj.feedLinks = [...stateObj.feedLinks, url];
+        stateObj.feeds = [{ title, items }, ...stateObj.feeds];
       })
       .catch(() => {
         state.process = 'error';// написать функцию,которая возвращает ошибку
@@ -48,16 +46,17 @@ export default () => {
   });
 
   button.addEventListener('click', () => {
+    console.log(state.feeds);
     state.process = 'loading';
     const link = state.value;
     input.value = '';
     state.inputFrame = 'none';
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
-    const filtered = state.feedslist.filter(item => item === url);
+    const filtered = state.feedLinks.filter(item => item === url);
     if (filtered.length === 0) getFeed(url, state);
     else {
-        state.process = 'duplicate';// написать функцию,которая возвращает ошибку
+      state.process = 'duplicate';// написать функцию,которая возвращает ошибку
     }
   });
 
@@ -79,27 +78,40 @@ export default () => {
     }, 3000);
   };
 
+  const whenSuccess = () => {
+    const success = `
+    <div class="alert alert-success alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span></button>
+        Loading...
+</div> `;
+    const div = document.createElement('div');
+    div.innerHTML = success;
+    successTag.appendChild(div);
+  };
+
   const processState = () => {
     switch (state.process) {
       case 'init':
-        // button.setAttribute('disabled', 'disabled');
         button.removeAttribute('disabled');
         input.classList.add('none');
         input.classList.remove('is-valid', 'is-invalid');
         input.removeAttribute('readonly', 'readonly');
-        // форму очистить
+        successTag.innerHTML = '';
         break;
 
       case 'invalid':
         button.setAttribute('disabled', 'disabled');
         input.classList.remove('is-valid');
         input.classList.add('is-invalid');
+        successTag.innerHTML = '';
         break;
 
       case 'valid':
         button.removeAttribute('disabled');
         input.classList.remove('is-invalid');
         input.classList.add('is-valid');
+        successTag.innerHTML = '';
         break;
 
       case 'loading':
@@ -107,6 +119,8 @@ export default () => {
         input.classList.remove('is-valid', 'is-invalid');
         input.classList.add('none');
         input.setAttribute('readonly', 'readonly');
+        whenSuccess();
+
         // добавить колесико прокрутки
         break;
 
@@ -115,16 +129,17 @@ export default () => {
         input.classList.add('none');
         input.classList.remove('is-valid', 'is-invalid');
         input.removeAttribute('readonly', 'readonly');
-        console.log(state.feedslist);
+        successTag.innerHTML = '';
         // рамку подсветить желтым
 
         break;
 
-      case 'error':// если ссылка вернула ошибку
+      case 'error':
         button.removeAttribute('disabled');
         input.classList.add('none');
         input.classList.remove('is-valid', 'is-invalid');
         input.removeAttribute('readonly', 'readonly');
+        successTag.innerHTML = '';
         whenError();
 
         break;
