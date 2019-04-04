@@ -18,6 +18,24 @@ const getFeed = (url, state) => {
     })
     .catch(() => {
       state.process = 'error';
+    })
+    .finally(() => {
+      setTimeout(() => {
+        console.log('sds');
+        /*
+        state.cleaning += 1;
+        state.feeds.length = 0;
+        const links = [];
+        state.feedLinks.forEach((link) => {
+          links.push(link);
+        });
+        state.feedLinks.length = 0;
+        links.forEach((link) => {
+          getFeed(link, state);
+
+        });
+        */
+      }, 5000);
     });
 };
 

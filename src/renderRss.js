@@ -3,14 +3,19 @@ export default (item, index) => {
   const title = item.querySelector('title').textContent;
   const description = item.querySelector('description').textContent;
   return `
-      <li class="col-12">
-        <a href="${href}">
+      <li class="row">
+        <div class="col-12 col-xs-12 col-sm-10 col-md-9 col-lg-10">
+        <a href="${href}" class="text-dark .bg-light btn-block">
           ${title}
         </a>
-        <a href="#" class="nav-link modalWindow" data-toggle="modal" data-target="#modal${index}">
-          Open
-        </a>
+        </div>
+        <div class="col-12 col-xs-12 col-sm-2 col-md-3 col-lg-2">
+        <button type="button" class="btn btn-outline-success btn-sm btn-block" data-toggle="modal" data-target="#modal${index}">
+          Read
+        </button>
+        </div>
         </li>
+
         <div class="modal fade" id="modal${index}" tabindex="-1" role="dialog" aria-labelledby="modalWindow"
           aria-hidden="true">
           <div class="modal-dialog" role="document">

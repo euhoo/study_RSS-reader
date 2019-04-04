@@ -17,6 +17,7 @@ export default () => {
     feeds: [],
     value: '',
     currentFeed: {},
+    cleaning: 0,
   };
 
   addListeners(input, state, button);
@@ -56,6 +57,10 @@ export default () => {
 
   };
 
+  const makeClean = () => {
+    document.querySelector('#rss').innerHTML = '';
+  };
+
   const addRss = () => {
     const result = [];
     const feed = state.currentFeed;
@@ -69,7 +74,7 @@ export default () => {
         <div  class="col-12">
           <h2>${feed.title}</h2>
         </div>
-        <div class="col-12">
+        <div class="col-12 w-100">
           ${result.join('')}
         </div>
       </div>`;
@@ -78,4 +83,5 @@ export default () => {
 
   watch(state, 'process', () => stateEvents[state.process]());
   watch(state, 'currentFeed', addRss);
+  watch(state, 'cleaning', makeClean);
 };
