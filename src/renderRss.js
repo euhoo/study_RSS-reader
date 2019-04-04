@@ -2,6 +2,8 @@ export default (item, index) => {
   const href = item.querySelector('link').textContent;
   const title = item.querySelector('title').textContent;
   const description = item.querySelector('description').textContent;
+  const id = title.split(' ').join('').substr(1, 12);
+  const clearId = `${id.replace(/[.,/#!$%^&*;:'’{}=\-_`~()]/g, '')}${index}`;
   return `
       <li class="row">
         <div class="col-12 col-xs-12 col-sm-10 col-md-9 col-lg-10">
@@ -10,18 +12,18 @@ export default (item, index) => {
         </a>
         </div>
         <div class="col-12 col-xs-12 col-sm-2 col-md-3 col-lg-2">
-        <button type="button" class="btn btn-outline-success btn-sm btn-block" data-toggle="modal" data-target="#modal${index}">
+        <button type="button" class="btn btn-outline-success btn-sm btn-block" data-toggle="modal" data-target="#modal${clearId}">
           Read
         </button>
         </div>
         </li>
 
-        <div class="modal fade" id="modal${index}" tabindex="-1" role="dialog" aria-labelledby="modalWindow"
+        <div class="modal fade" id="modal${clearId}" tabindex="-1" role="dialog" aria-labelledby="modalWindow"
           aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="modalWindowLabel${index}">
+                <h5 class="modal-title" id="modalWindowLabel${clearId}">
                   ${title}
                 </h5>
                 <button class="close" type="button" data-dismiss="modal" aria-label="close">
