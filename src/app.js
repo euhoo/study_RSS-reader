@@ -34,9 +34,6 @@ export default () => {
       })
       .catch(() => {
         state.process = 'error';
-        setTimeout(() => {
-          state.process = 'init';
-        }, 3000);
       });
   };
 
@@ -49,8 +46,7 @@ export default () => {
   button.addEventListener('click', () => {
     state.process = 'loading';
     const link = state.value;
-    input.value = '';
-    state.inputFrame = 'none';
+    
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
     const filtered = state.feedLinks.filter(item => item === url);
@@ -76,14 +72,19 @@ export default () => {
     parent.appendChild(div);
   };
 
+  const cleaning = (y = 0) => {
+    if (y === 0) successTag.innerHTML = '';
+    button.removeAttribute('disabled');
+    input.classList.add('none');
+    input.classList.remove('is-valid', 'is-invalid');
+    input.removeAttribute('readonly', 'readonly');
+  };
+
   const processState = () => {
     switch (state.process) {
       case 'init':
-        button.removeAttribute('disabled');
-        input.classList.add('none');
-        input.classList.remove('is-valid', 'is-invalid');
-        input.removeAttribute('readonly', 'readonly');
-        successTag.innerHTML = '';
+        input.value = '';
+        cleaning();
         break;
 
       case 'invalid':
@@ -94,45 +95,33 @@ export default () => {
         break;
 
       case 'valid':
-        button.removeAttribute('disabled');
-        input.classList.remove('is-invalid');
+        cleaning();
         input.classList.add('is-valid');
-        successTag.innerHTML = '';
         break;
 
       case 'loading':
+        cleaning(1);
         button.setAttribute('disabled', 'disabled');
-        input.classList.remove('is-valid', 'is-invalid');
-        input.classList.add('none');
         input.setAttribute('readonly', 'readonly');
         eventLoader('success', 'Loading...');
         break;
 
       case 'duplicate':
-        button.removeAttribute('disabled');
-        input.classList.add('none');
-        input.classList.remove('is-valid', 'is-invalid');
-        input.removeAttribute('readonly', 'readonly');
-        successTag.innerHTML = '';
+        input.value = '';
+        cleaning();
         break;
 
       case 'error':
-        button.removeAttribute('disabled');
-        input.classList.add('none');
-        input.classList.remove('is-valid', 'is-invalid');
-        input.removeAttribute('readonly', 'readonly');
-        successTag.innerHTML = '';
+        cleaning();
         eventLoader('danger', 'Error! Address is not RSS or link is not correct!');
         setTimeout(() => {
           errorTag.innerHTML = '';
         }, 3000);
-
         break;
       default:
         break;
     }
   };
-
 
   const feedState = () => {
     const res = [];
