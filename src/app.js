@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-param-reassign */
 import WatchJS from 'melanke-watchjs';
 import axios from 'axios';
 import isURL from 'validator/lib/isURL';
@@ -12,10 +10,11 @@ export default () => {
   const successTag = document.querySelector('#success');
 
   const state = {
-    process: 'init', // invalid, loading, error, duplicate, valid
+    process: 'init',
     feedLinks: [],
     feeds: [],
     value: '',
+    currendFeed: {},
   };
 
 
@@ -27,14 +26,16 @@ export default () => {
         const doc = parser.parseFromString(data, 'application/xml');
         const title = doc.querySelector('title').textContent;
         const items = [...doc.querySelectorAll('item')];
-        /* добавляю ссылку именно здесь,т.к. здесь мы появляемся,только если ссылка - rss */
+        // eslint-disable-next-line no-param-reassign
         stateObj.feedLinks = [...stateObj.feedLinks, url];
-        stateObj.feeds = [{ title, items }, ...stateObj.feeds];
+        state.currendFeed = { title, items };
+        // eslint-disable-next-line no-param-reassign
+        stateObj.feeds = [state.currendFeed, ...stateObj.feeds];
       })
       .catch(() => {
-        state.process = 'error';// написать функцию,которая возвращает ошибку
+        state.process = 'error';
         setTimeout(() => {
-          state.process = 'init';// написать функцию,которая возвращает ошибку
+          state.process = 'init';
         }, 3000);
       });
   };
@@ -46,7 +47,6 @@ export default () => {
   });
 
   button.addEventListener('click', () => {
-    console.log(state.feeds);
     state.process = 'loading';
     const link = state.value;
     input.value = '';
@@ -56,7 +56,7 @@ export default () => {
     const filtered = state.feedLinks.filter(item => item === url);
     if (filtered.length === 0) getFeed(url, state);
     else {
-      state.process = 'duplicate';// написать функцию,которая возвращает ошибку
+      state.process = 'duplicate';
     }
   });
 
@@ -120,8 +120,6 @@ export default () => {
         input.classList.add('none');
         input.setAttribute('readonly', 'readonly');
         whenSuccess();
-
-        // добавить колесико прокрутки
         break;
 
       case 'duplicate':
@@ -130,8 +128,6 @@ export default () => {
         input.classList.remove('is-valid', 'is-invalid');
         input.removeAttribute('readonly', 'readonly');
         successTag.innerHTML = '';
-        // рамку подсветить желтым
-
         break;
 
       case 'error':
@@ -148,5 +144,32 @@ export default () => {
     }
   };
 
+
+  const feedState = () => {
+    const res = [];
+    const feed = state.currendFeed;
+    feed.items.forEach((item) => {
+      const feedStr = `
+      <li class="col-12">
+        <a href="${item.querySelector('link').textContent}">
+          ${item.querySelector('title').textContent}
+        </a>
+      </li>`;
+      res.push(feedStr);
+    });
+    const div = document.createElement('div');
+    div.innerHTML = `
+      <div class="row no-gutters">
+        <div  class="col-12">
+          <h2>${feed.title}</h2>
+        </div>
+        <div class="col-12">
+          ${res.join('')}
+        </div>
+      </div>`;
+    document.querySelector('#rss').appendChild(div);
+  };
+
   watch(state, 'process', processState);
+  watch(state, 'currendFeed', feedState);
 };
