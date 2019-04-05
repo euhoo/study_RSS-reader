@@ -74,10 +74,10 @@ export default (input, state, button) => {
 
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
-    const filtered = state.feedLinks.filter(item => item === url);
-    if (filtered.length === 0) getFeed(url, state);
+    const filtered = state.feedLinks.find(item => item === url);
+    if (!filtered) getFeed(url, state);
     else {
-      state.process = 'duplicate';
+      state.process = 'init';
     }
   });
 };

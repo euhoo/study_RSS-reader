@@ -2,12 +2,11 @@ import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
 import renderRss from './renderRss';
 import { cleaning, eventLoader } from './utils';
-// import makeModalWindow from './modal';
 
 export default () => {
   const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
-  const button = document.querySelector('#main-button');
+  const button = document.querySelector('button[type="submit"]');
   const errorTag = document.querySelector('#danger');
   const successTag = document.querySelector('#success');
 
