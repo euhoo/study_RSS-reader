@@ -1,3 +1,10 @@
+export const randomIdGenerator = (title, index) => {
+  const id = title.split(' ').join('').substr(1, 12);
+  const random = Math.random().toString(36).substr(2, 25);
+  const clearId = `${id.replace(/[.,/#!$%^&*;:'’{}=\-_`~()]/g, '')}${index}`;
+  return `${index}${clearId}${random}`;
+};
+
 export const cleaning = (button, successTag, input, y = 0) => {
   // eslint-disable-next-line no-param-reassign
   if (y === 0) successTag.innerHTML = '';

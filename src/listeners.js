@@ -1,9 +1,53 @@
+
 /* eslint-disable no-param-reassign */
+// подключить здесь lodash
 import axios from 'axios';
 import isURL from 'validator/lib/isURL';
+import _ from 'lodash';
+
+const parser = new DOMParser();
+
+const nakeUpdate = (state) => {
+  const links = state.feedLinks;
+  links.forEach((link) => {
+    axios.get(link)
+      .then(({ data }) => {
+        // state.newFeeds.length = 0; // обнулили массив с новыми новостями
+        const doc = parser.parseFromString(data, 'application/xml');
+        const existTitle = doc.querySelector('title').textContent; // title rss канала
+        const obj = {
+          existFeed: '',
+          index: 0,
+        };
+        state.feeds.forEach((el, index) => {
+          if (el.title === existTitle) {
+            // console.log(el.items[0]);
+            obj.existFeed = el.items[0];
+            obj.index = index;
+          }
+        });
+        const newFeed = doc.querySelector('item');
+        if (newFeed.querySelector('link').textContent !== obj.existFeed.querySelector('link').textContent) {
+          state.feeds[obj.index].items.unshift(newFeed);
+          state.newFeeds = {
+            channel: existTitle,
+            content: newFeed,
+          }; // добавляем наш объект в result;
+        }
+      })
+      .catch(() => {
+        // state.process = 'error';// пересмотреть куда будет выводиться ошибка. сюда ее выводить ошибочно
+      })
+      .finally(() => {
+        setTimeout(() => {
+          nakeUpdate(state);
+        }, 2000);
+      });
+  });
+};
+
 
 const getFeed = (url, state) => {
-  const parser = new DOMParser();
   axios.get(url)
     .then(({ data }) => {
       state.process = 'init';
@@ -21,21 +65,8 @@ const getFeed = (url, state) => {
     })
     .finally(() => {
       setTimeout(() => {
-        console.log('sds');
-        /*
-        state.cleaning += 1;
-        state.feeds.length = 0;
-        const links = [];
-        state.feedLinks.forEach((link) => {
-          links.push(link);
-        });
-        state.feedLinks.length = 0;
-        links.forEach((link) => {
-          getFeed(link, state);
-
-        });
-        */
-      }, 5000);
+        nakeUpdate(state);
+      }, 2000);
     });
 };
 

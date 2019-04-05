@@ -17,7 +17,7 @@ export default () => {
     feeds: [],
     value: '',
     currentFeed: {},
-    cleaning: 0,
+    newFeeds: [],
   };
 
   addListeners(input, state, button);
@@ -74,14 +74,26 @@ export default () => {
         <div  class="col-12">
           <h2>${feed.title}</h2>
         </div>
-        <div class="col-12 w-100">
+        <div class="tag-to-add col-12 w-100">
           ${result.join('')}
         </div>
       </div>`;
     document.querySelector('#rss').appendChild(div);
   };
 
+  const addFeed = () => {
+    const channelTitle = state.newFeeds.channel;
+    const item = state.newFeeds.content;
+    const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);// нашли соседа тега, крепимся к его соседу
+    const tagToAddFeed = h2[0].parentNode.nextElementSibling; // нашли тег,куда будем крепить новость;
+    const content = renderRss(item, 252);
+    const div = document.createElement('div');
+    div.innerHTML = content;
+    tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);// добавляем перед первым потомком
+  };
+
   watch(state, 'process', () => stateEvents[state.process]());
   watch(state, 'currentFeed', addRss);
   watch(state, 'cleaning', makeClean);
+  watch(state, 'newFeeds', addFeed);
 };
