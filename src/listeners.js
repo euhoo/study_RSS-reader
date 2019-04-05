@@ -36,7 +36,7 @@ const nakeUpdate = (state) => {
       .finally(() => {
         setTimeout(() => {
           nakeUpdate(state);
-        }, 2000);
+        }, 5000);
       });
   });
 };
@@ -61,7 +61,7 @@ const getFeed = (url, state) => {
   /* .finally(() => {
       setTimeout(() => {
         nakeUpdate(state);
-      }, 2000);
+      }, 5000);
     }) */
 };
 

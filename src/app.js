@@ -69,7 +69,9 @@ export default () => {
           ${result.join('')}
         </div>
       </div>`;
-    document.querySelector('#rss').appendChild(div);
+    const rssDiv = document.querySelector('#rss');
+    // document.querySelector('#rss').appendChild(div);
+    rssDiv.insertBefore(div, rssDiv.firstChild);
   };
 
   /* const addFeed = () => {
