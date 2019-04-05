@@ -14,7 +14,6 @@
     "bootstrap": "^4.3.1",
     "cssnano": "^4.1.10",
     "jquery": "^3.3.1",
-    "lodash": "^4.17.11",
     "melanke-watchjs": "^1.5.0",
     "popper.js": "^1.14.7",
     "validator": "^10.11.0"

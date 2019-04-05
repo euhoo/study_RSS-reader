@@ -1,9 +1,7 @@
 
 /* eslint-disable no-param-reassign */
-// подключить здесь lodash
 import axios from 'axios';
 import isURL from 'validator/lib/isURL';
-import _ from 'lodash';
 
 const parser = new DOMParser();
 
@@ -12,31 +10,24 @@ const nakeUpdate = (state) => {
   links.forEach((link) => {
     axios.get(link)
       .then(({ data }) => {
-        // state.newFeeds.length = 0; // обнулили массив с новыми новостями
         const doc = parser.parseFromString(data, 'application/xml');
-        const existTitle = doc.querySelector('title').textContent; // title rss канала
-        const obj = {
-          existFeed: '',
-          index: 0,
-        };
-        state.feeds.forEach((el, index) => {
+        const existTitle = doc.querySelector('title').textContent;
+        let existFeed;
+        state.feeds.forEach((el) => {
           if (el.title === existTitle) {
-            // console.log(el.items[0]);
-            obj.existFeed = el.items[0];
-            obj.index = index;
+            existFeed = el.items;
+            console.log(existFeed);
           }
         });
         const newFeed = doc.querySelector('item');
-        if (newFeed.querySelector('link').textContent !== obj.existFeed.querySelector('link').textContent) {
-          state.feeds[obj.index].items.unshift(newFeed);
-          state.newFeeds = {
+        if (newFeed.querySelector('link').textContent !== existFeed[0].querySelector('link').textContent) {
+          state.newFeed = {
             channel: existTitle,
             content: newFeed,
-          }; // добавляем наш объект в result;
+          };
         }
       })
       .catch(() => {
-        // state.process = 'error';// пересмотреть куда будет выводиться ошибка. сюда ее выводить ошибочно
       })
       .finally(() => {
         setTimeout(() => {
