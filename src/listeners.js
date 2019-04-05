@@ -3,20 +3,23 @@
 import axios from 'axios';
 import isURL from 'validator/lib/isURL';
 
-const parser = new DOMParser();
+const parse = (data) => {
+  const parser = new DOMParser();
+  return parser.parseFromString(data, 'application/xml');
+};
+
 
 const nakeUpdate = (state) => {
   const links = state.feedLinks;
   links.forEach((link) => {
     axios.get(link)
       .then(({ data }) => {
-        const doc = parser.parseFromString(data, 'application/xml');
+        const doc = parse(data);
         const existTitle = doc.querySelector('title').textContent;
         let existFeed;
         state.feeds.forEach((el) => {
           if (el.title === existTitle) {
             existFeed = el.items;
-            console.log(existFeed);
           }
         });
         const newFeed = doc.querySelector('item');
@@ -37,12 +40,11 @@ const nakeUpdate = (state) => {
   });
 };
 
-
 const getFeed = (url, state) => {
   axios.get(url)
     .then(({ data }) => {
       state.process = 'init';
-      const doc = parser.parseFromString(data, 'application/xml');
+      const doc = parse(data);
       const title = doc.querySelector('title').textContent;
       const items = [...doc.querySelectorAll('item')];
 
@@ -65,7 +67,8 @@ export default (input, state, button) => {
   input.addEventListener('input', ({ target }) => {
     state.value = target.value;
     if (state.value.length === 0) state.process = 'init';
-    else state.process = isURL(state.value) ? 'valid' : 'invalid';
+    else if (isURL(state.value)) state.process = 'valid';
+    else if (!isURL(state.value)) state.process = 'invalid';
   });
 
   button.addEventListener('click', () => {

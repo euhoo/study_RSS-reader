@@ -1,14 +1,8 @@
-import { randomIdGenerator } from './utils';
-
 export default (item, index = 123) => {
   const href = item.querySelector('link').textContent;
   const title = item.querySelector('title').textContent;
   const description = item.querySelector('description').textContent;
-
-  
-  /* here was only index and title using id-generator but it don't work when feeds updating */
-
-  const id = randomIdGenerator(title, index);
+  const id = `${index}${Math.random().toString(36).substr(2, 25)}`;
 
   return `
         <li class="row">

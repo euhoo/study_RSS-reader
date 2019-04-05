@@ -1,7 +1,7 @@
+/* eslint-disable no-use-before-define */
 import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
 import renderRss from './renderRss';
-import { cleaning, eventLoader } from './utils';
 
 export default () => {
   const { watch } = WatchJS;
@@ -21,10 +21,10 @@ export default () => {
 
   addListeners(input, state, button);
 
-  const stateEvents = {
+  const formState = {
     init: () => {
       input.value = '';
-      cleaning(button, successTag, input);
+      cleaning();
     },
     invalid: () => {
       button.setAttribute('disabled', 'disabled');
@@ -33,31 +33,27 @@ export default () => {
       successTag.innerHTML = '';
     },
     valid: () => {
-      cleaning(button, successTag, input);
+      cleaning();
       input.classList.add('is-valid');
     },
     loading: () => {
-      cleaning(button, successTag, input, 1);
+      cleaning(1);
       button.setAttribute('disabled', 'disabled');
       input.setAttribute('readonly', 'readonly');
-      eventLoader('success', 'Loading...');
+      loadEvent('success', 'Loading...');
     },
     duplicate: () => {
       input.value = '';
-      cleaning(button, successTag, input);
+      cleaning();
     },
     error: () => {
-      cleaning(button, successTag, input);
-      eventLoader('danger', 'Error! Address is not RSS or link is not correct!');
+      cleaning();
+      loadEvent('danger', 'Error! Address is not RSS or link is not correct!');
       setTimeout(() => {
         errorTag.innerHTML = '';
       }, 3000);
     },
 
-  };
-
-  const makeClean = () => {
-    document.querySelector('#rss').innerHTML = '';
   };
 
   const addRss = () => {
@@ -83,15 +79,39 @@ export default () => {
   const addFeed = () => {
     const channelTitle = state.newFeed.channel;
     const item = state.newFeed.content;
-    const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);// нашли соседа тега, крепимся к его соседу
-    const tagToAddFeed = h2[0].parentNode.nextElementSibling; // нашли тег,куда будем крепить новость;
+    const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);
+    const tagToAddFeed = h2[0].parentNode.nextElementSibling;
     const content = renderRss(item, 252);
     const div = document.createElement('div');
     div.innerHTML = content;
-    tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);// добавляем перед первым потомком
+    tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
+  };
+  const cleaning = (y = 0) => {
+    // eslint-disable-next-line no-param-reassign
+    if (y === 0) successTag.innerHTML = '';
+    button.removeAttribute('disabled');
+    input.classList.add('none');
+    input.classList.remove('is-valid', 'is-invalid');
+    input.removeAttribute('readonly', 'readonly');
+  };
+  const makeClean = () => {
+    document.querySelector('#rss').innerHTML = '';
+  };
+  
+  const loadEvent = (event, message) => {
+    const parent = document.querySelector(`#${event}`);
+    const tag = `
+      <div class="alert alert-${event} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+          ${message}
+  </div> `;
+    const div = document.createElement('div');
+    div.innerHTML = tag;
+    parent.appendChild(div);
   };
 
-  watch(state, 'process', () => stateEvents[state.process]());
+  watch(state, 'process', () => formState[state.process]());
   watch(state, 'currentFeed', addRss);
   watch(state, 'cleaning', makeClean);
   watch(state, 'newFeed', addFeed);
