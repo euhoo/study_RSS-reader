@@ -42,10 +42,6 @@ export default () => {
       input.setAttribute('readonly', 'readonly');
       loadEvent('success', 'Loading...');
     },
-    duplicate: () => {
-      input.value = '';
-      cleaning();
-    },
     error: () => {
       cleaning();
       loadEvent('danger', 'Error! Address is not RSS or link is not correct!');
@@ -56,7 +52,7 @@ export default () => {
 
   };
 
-  const addRss = () => {
+  const renderRss = () => {
     const result = [];
     const feed = state.currentFeed;
     feed.items.forEach((item, index) => {
@@ -76,7 +72,7 @@ export default () => {
     document.querySelector('#rss').appendChild(div);
   };
 
-  const addFeed = () => {
+  /* const addFeed = () => {
     const channelTitle = state.newFeed.channel;
     const item = state.newFeed.content;
     const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);
@@ -86,6 +82,7 @@ export default () => {
     div.innerHTML = content;
     tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
   };
+  */
   const cleaning = (y = 0) => {
     // eslint-disable-next-line no-param-reassign
     if (y === 0) successTag.innerHTML = '';
@@ -111,7 +108,7 @@ export default () => {
   };
 
   watch(state, 'process', () => formState[state.process]());
-  watch(state, 'currentFeed', addRss);
+  watch(state, 'currentFeed', renderRss);
   watch(state, 'cleaning', makeClean);
-  watch(state, 'newFeed', addFeed);
+  // watch(state, 'newFeed', addFeed);
 };

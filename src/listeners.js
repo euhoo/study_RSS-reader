@@ -8,7 +8,7 @@ const parse = (data) => {
   return parser.parseFromString(data, 'application/xml');
 };
 
-
+/*
 const nakeUpdate = (state) => {
   const links = state.feedLinks;
   links.forEach((link) => {
@@ -23,7 +23,8 @@ const nakeUpdate = (state) => {
           }
         });
         const newFeed = doc.querySelector('item');
-        if (newFeed.querySelector('link').textContent !== existFeed[0].querySelector('link').textContent) {
+        if (newFeed.querySelector('link').textContent !== existFeed[0].
+        // querySelector('link').textContent) {
           state.newFeed = {
             channel: existTitle,
             content: newFeed,
@@ -39,6 +40,7 @@ const nakeUpdate = (state) => {
       });
   });
 };
+*/
 
 const getFeed = (url, state) => {
   axios.get(url)
@@ -55,12 +57,12 @@ const getFeed = (url, state) => {
     })
     .catch(() => {
       state.process = 'error';
-    })
-    .finally(() => {
+    });
+  /* .finally(() => {
       setTimeout(() => {
         nakeUpdate(state);
       }, 2000);
-    });
+    }) */
 };
 
 export default (input, state, button) => {
