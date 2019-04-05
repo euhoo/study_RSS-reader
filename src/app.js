@@ -40,11 +40,11 @@ export default () => {
       cleaning(1);
       button.setAttribute('disabled', 'disabled');
       input.setAttribute('readonly', 'readonly');
-      loadEvent('success', 'Loading...');
+      renderEvents('success', 'Loading...');
     },
     error: () => {
       cleaning();
-      loadEvent('danger', 'Error! Address is not RSS or link is not correct!');
+      renderEvents('danger', 'Error! Address is not RSS or link is not correct!');
       setTimeout(() => {
         errorTag.innerHTML = '';
       }, 3000);
@@ -74,7 +74,7 @@ export default () => {
     rssDiv.insertBefore(div, rssDiv.firstChild);
   };
 
-  /* const addFeed = () => {
+  const addNewFeed = () => {
     const channelTitle = state.newFeed.channel;
     const item = state.newFeed.content;
     const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);
@@ -84,7 +84,7 @@ export default () => {
     div.innerHTML = content;
     tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
   };
-  */
+
   const cleaning = (y = 0) => {
     // eslint-disable-next-line no-param-reassign
     if (y === 0) successTag.innerHTML = '';
@@ -93,10 +93,10 @@ export default () => {
     input.classList.remove('is-valid', 'is-invalid');
     input.removeAttribute('readonly', 'readonly');
   };
-  const makeClean = () => {
+  const makeCleanRssTag = () => {
     document.querySelector('#rss').innerHTML = '';
   };
-  const loadEvent = (event, message) => {
+  const renderEvents = (event, message) => {
     const parent = document.querySelector(`#${event}`);
     const tag = `
       <div class="alert alert-${event} alert-dismissible" role="alert">
@@ -111,6 +111,6 @@ export default () => {
 
   watch(state, 'process', () => formState[state.process]());
   watch(state, 'currentFeed', renderRss);
-  watch(state, 'cleaning', makeClean);
-  // watch(state, 'newFeed', addFeed);
+  watch(state, 'cleaning', makeCleanRssTag);
+  watch(state, 'newFeed', addNewFeed);
 };
