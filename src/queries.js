@@ -9,11 +9,9 @@ const parse = (data) => {
 const updateQuery = (state, url, title) => {
   axios.get(url)
     .then(({ data }) => {
-      console.log('in');
       let existFeed;
       state.feeds.forEach((el) => {
         if (el.title === title) {
-          console.log(el.items);
           existFeed = el.items;
         }
       });
