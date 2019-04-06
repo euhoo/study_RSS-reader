@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import isURL from 'validator/lib/isURL';
-import { getFeed } from './queries';
+import feedQuery from './queries';
 
 export default (input, state, button) => {
   input.addEventListener('input', ({ target }) => {
@@ -17,7 +17,7 @@ export default (input, state, button) => {
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
     const filtered = state.feedLinks.find(item => item === url);
-    if (!filtered) getFeed(url, state);
+    if (!filtered) feedQuery(url, state);
     else {
       state.process = 'init';
     }

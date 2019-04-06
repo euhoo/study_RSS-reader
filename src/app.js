@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
-import renderFeeds from './renderFeeds';
+import renderFeed from './renderFeed';
 
 export default () => {
   const { watch } = WatchJS;
@@ -55,8 +55,10 @@ export default () => {
   const renderRss = () => {
     const result = [];
     const feed = state.currentFeed;
+    const lengthOfNews = 10;
+    feed.items.length = lengthOfNews;
     feed.items.forEach((item, index) => {
-      const rssTag = renderFeeds(item, index);
+      const rssTag = renderFeed(item, index);
       result.push(rssTag);
     });
     const div = document.createElement('div');
@@ -70,7 +72,6 @@ export default () => {
         </div>
       </div>`;
     const rssDiv = document.querySelector('#rss');
-    // document.querySelector('#rss').appendChild(div);
     rssDiv.insertBefore(div, rssDiv.firstChild);
   };
 
@@ -79,7 +80,7 @@ export default () => {
     const item = state.newFeed.content;
     const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);
     const tagToAddFeed = h2[0].parentNode.nextElementSibling;
-    const content = renderFeeds(item, 252);
+    const content = renderFeed(item, 252);
     const div = document.createElement('div');
     div.innerHTML = content;
     tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);

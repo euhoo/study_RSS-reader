@@ -6,13 +6,14 @@ const parse = (data) => {
   return parser.parseFromString(data, 'application/xml');
 };
 
-const makeUpdate = (state, url, title) => {
+const updateQuery = (state, url, title) => {
   axios.get(url)
     .then(({ data }) => {
       console.log('in');
       let existFeed;
       state.feeds.forEach((el) => {
         if (el.title === title) {
+          console.log(el.items);
           existFeed = el.items;
         }
       });
@@ -27,11 +28,11 @@ const makeUpdate = (state, url, title) => {
       }
     })
     .catch(() => {
+      console.log('error');
     });
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export const getFeed = (url, state) => {
+export default (url, state) => {
   let link;
   let existTitle;
 
@@ -52,10 +53,9 @@ export const getFeed = (url, state) => {
     })
     .finally(() => {
       if (link) {
-        console.log('out');
         setInterval(() => {
-        makeUpdate(state, link, existTitle);
-      }, 2000);
+          updateQuery(state, link, existTitle);
+        }, 5000);
       }
     });
 };
