@@ -23,8 +23,12 @@ export default () => {
 
   const formState = {
     init: () => {
+      button.removeAttribute('disabled');
+      input.classList.add('none');
+      input.classList.remove('is-valid', 'is-invalid');
+      input.removeAttribute('readonly', 'readonly');
+      successTag.innerHTML = '';
       input.value = '';
-      cleaning();
     },
     invalid: () => {
       button.setAttribute('disabled', 'disabled');
@@ -33,17 +37,24 @@ export default () => {
       successTag.innerHTML = '';
     },
     valid: () => {
-      cleaning();
+      button.removeAttribute('disabled');
+      input.classList.remove('is-invalid');
       input.classList.add('is-valid');
+      successTag.innerHTML = '';
     },
     loading: () => {
-      cleaning(1);
       button.setAttribute('disabled', 'disabled');
+      input.classList.remove('is-valid', 'is-invalid');
+      input.classList.add('none');
       input.setAttribute('readonly', 'readonly');
       renderEvents('success', 'Loading...');
     },
     error: () => {
-      cleaning();
+      button.removeAttribute('disabled');
+      input.classList.add('none');
+      input.classList.remove('is-valid', 'is-invalid');
+      input.removeAttribute('readonly', 'readonly');
+      successTag.innerHTML = '';
       renderEvents('danger', 'Error! Address is not RSS or link is not correct!');
       setTimeout(() => {
         errorTag.innerHTML = '';
