@@ -11,16 +11,16 @@ const updateQuery = (state) => {
   const links = state.feedLinks;
   axios.all(links.map(link => axios.get(link)))
     .then((allFeeds) => {
-      const documents = [...allFeeds.reduce((acc, feed) => [parse(feed.data), ...acc], [])];
-      const newFeeds = [...documents.map(doc => [...doc.querySelectorAll('item')])].flat();
-      const existItems = state.currentFeed;
+      const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data), ...acc], [])]
+        .map(doc => [...doc.querySelectorAll('item')])
+        .flat();
+      const existItems = state.feeds;
       const mappedNewFeeds = newFeeds.map(feed => feed.querySelector('link').textContent);
       const mappedOldFeeds = existItems.map(feed => feed.querySelector('link').textContent);
       const diff = difference(mappedNewFeeds, mappedOldFeeds);
       const feedsToAdd = newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
-      console.log(feedsToAdd);
       if (feedsToAdd.length > 0) {
-        state.currentFeed = [...feedsToAdd, ...state.currentFeed];
+        state.feeds = [...feedsToAdd, ...state.feeds];
       }
     });
 };
@@ -32,8 +32,9 @@ export default (url, state) => {
       const doc = parse(data);
       const title = doc.querySelector('title').textContent;
       const items = [...doc.querySelectorAll('item')];
+      state.channelTitles = [title, ...state.channelTitles];
       state.feedLinks = [...state.feedLinks, url];
-      state.currentFeed = [...state.currentFeed, ...items];
+      state.feeds = [...items, ...state.feeds];
       link = url;
     })
     .catch(() => {

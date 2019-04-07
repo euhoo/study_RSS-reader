@@ -10,12 +10,10 @@ export default () => {
 
   const state = {
     processState: 'init',
+    value: '',
     feedLinks: [],
     feeds: [],
-    value: '',
-    currentFeed: [],
-    newFeed: {},
-    titles: [],
+    channelTitles: [],
   };
 
   addListeners(input, state, button);
@@ -77,7 +75,7 @@ export default () => {
   const renderRssFeeds = () => {
     const divToAdd = document.querySelector('#tag-to-add');
     divToAdd.innerHTML = '';
-    const feed = state.currentFeed;
+    const feed = state.feeds;
     const func = (acc, el, ind) => {
       const newAcc = [...acc, renderFeed(el, ind)];
       return newAcc;
@@ -85,7 +83,7 @@ export default () => {
     const result = feed.reduce(func, []).join('');
     const div = document.createElement('div');
     div.innerHTML = result;
-    divToAdd.appendChild(div);
+    divToAdd.insertBefore(div, divToAdd.firstChild);
   };
 
   const renderRssTag = () => {
@@ -93,7 +91,6 @@ export default () => {
     div.innerHTML = `
       <div class="row no-gutters">
         <div id="rss-title" class="col-12">
-          <h2></h2>
         </div>
         <div id="tag-to-add" class="col-12 w-100">
         </div>
@@ -102,17 +99,6 @@ export default () => {
     rssDiv.appendChild(div);
   };
   renderRssTag();
-
-  const addNewFeed = () => {
-    const channelTitle = state.newFeed.channel;
-    const item = state.newFeed.content;
-    const h2 = [...document.querySelectorAll('h2')].filter(el => el.textContent === channelTitle);
-    const tagToAddFeed = h2[0].parentNode.nextElementSibling;
-    const content = renderFeed(item, 252);
-    const div = document.createElement('div');
-    div.innerHTML = content;
-    tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
-  };
 
   const renderEvents = (event, message) => {
     const parent = document.querySelector(`#${event}`);
@@ -127,7 +113,14 @@ export default () => {
     parent.appendChild(div);
   };
 
+  const renderTitles = () => {
+    const rssTitle = document.querySelector('#rss-title');
+    const title = document.createElement('p');
+    title.innerHTML = `<strong>${state.channelTitles[0]}</strong>`;
+    rssTitle.appendChild(title);
+  };
+
   watch(state, 'processState', () => formStateActions[state.processState]());
-  watch(state, 'currentFeed', renderRssFeeds);
- // watch(state, 'newFeed', addNewFeed);
+  watch(state, 'feeds', renderRssFeeds);
+  watch(state, 'channelTitles', renderTitles);
 };
