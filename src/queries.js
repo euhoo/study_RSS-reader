@@ -7,21 +7,26 @@ const parse = (data) => {
   return parser.parseFromString(data, 'application/xml');
 };
 
+const findNewFeeds = (newFeeds, oldFeeds) => {
+  const newFeedsLinks = newFeeds.map(feed => feed.querySelector('link').textContent);
+  const OldFeedsLinks = oldFeeds.map(feed => feed.querySelector('link').textContent);
+  const diff = difference(newFeedsLinks, OldFeedsLinks);
+  return newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
+};
+
 const updateQuery = (state) => {
-  const links = state.feedLinks;
-  axios.all(links.map(link => axios.get(link)))
+  axios.all(state.feedLinks.map(link => axios.get(link)))
     .then((allFeeds) => {
       const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data), ...acc], [])]
         .map(doc => [...doc.querySelectorAll('item')])
         .flat();
-      const existItems = state.feeds;
-      const mappedNewFeeds = newFeeds.map(feed => feed.querySelector('link').textContent);
-      const mappedOldFeeds = existItems.map(feed => feed.querySelector('link').textContent);
-      const diff = difference(mappedNewFeeds, mappedOldFeeds);
-      const feedsToAdd = newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
+      const feedsToAdd = findNewFeeds(newFeeds, state.feeds);
       if (feedsToAdd.length > 0) {
         state.feeds = [...feedsToAdd, ...state.feeds];
       }
+    })
+    .catch(() => {
+      state.processState = 'error';
     });
 };
 export default (url, state) => {
