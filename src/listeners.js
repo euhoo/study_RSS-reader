@@ -13,7 +13,6 @@ export default (input, state, button) => {
   button.addEventListener('click', () => {
     state.processState = 'loading';
     const link = state.value;
-
     const cors = 'https://cors-anywhere.herokuapp.com/';
     const url = `${cors}${link}`;
     const filtered = state.feedLinks.find(item => item === url);

@@ -1,39 +1,31 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
+import { difference } from 'lodash';
 
 const parse = (data) => {
   const parser = new DOMParser();
   return parser.parseFromString(data, 'application/xml');
 };
 
-const updateQuery = (state, url, title) => {
-  axios.get(url)
-    .then(({ data }) => {
-      let existFeed;
-      state.feeds.forEach((el) => {
-        if (el.title === title) {
-          existFeed = el.items;
-        }
-      });
-      const doc = parse(data);
-      const newFeed = doc.querySelector('item');
-      if (newFeed.querySelector('link').textContent !== existFeed[0].querySelector('link').textContent) {
-        existFeed[0].querySelector('link').textContent = newFeed.querySelector('link').textContent;
-        state.newFeed = {
-          channel: title,
-          content: newFeed,
-        };
+const updateQuery = (state) => {
+  const links = state.feedLinks;
+  axios.all(links.map(link => axios.get(link)))
+    .then((allFeeds) => {
+      const documents = [...allFeeds.reduce((acc, feed) => [parse(feed.data), ...acc], [])];
+      const newFeeds = [...documents.map(doc => [...doc.querySelectorAll('item')])].flat();
+      const existItems = state.currentFeed;
+      const mappedNewFeeds = newFeeds.map(feed => feed.querySelector('link').textContent);
+      const mappedOldFeeds = existItems.map(feed => feed.querySelector('link').textContent);
+      const diff = difference(mappedNewFeeds, mappedOldFeeds);
+      const feedsToAdd = newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
+      console.log(feedsToAdd);
+      if (feedsToAdd.length > 0) {
+        state.currentFeed = [...feedsToAdd, ...state.currentFeed];
       }
-    })
-    .catch(() => {
-      console.log('error');
     });
 };
-
 export default (url, state) => {
   let link;
-  let existTitle;
-
   axios.get(url)
     .then(({ data }) => {
       state.processState = 'init';
@@ -41,10 +33,8 @@ export default (url, state) => {
       const title = doc.querySelector('title').textContent;
       const items = [...doc.querySelectorAll('item')];
       state.feedLinks = [...state.feedLinks, url];
-      state.currentFeed = { title, items };
-      state.feeds = [state.currentFeed, ...state.feeds];
+      state.currentFeed = [...state.currentFeed, ...items];
       link = url;
-      existTitle = title;
     })
     .catch(() => {
       state.processState = 'error';
@@ -52,7 +42,7 @@ export default (url, state) => {
     .finally(() => {
       if (link) {
         setInterval(() => {
-          updateQuery(state, link, existTitle);
+          updateQuery(state);
         }, 5000);
       }
     });

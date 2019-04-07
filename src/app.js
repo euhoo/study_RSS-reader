@@ -13,8 +13,9 @@ export default () => {
     feedLinks: [],
     feeds: [],
     value: '',
-    currentFeed: {},
+    currentFeed: [],
     newFeed: {},
+    titles: [],
   };
 
   addListeners(input, state, button);
@@ -73,27 +74,34 @@ export default () => {
       }, 3000);
     },
   };
-
-  const renderRss = () => {
+  const renderRssFeeds = () => {
+    const divToAdd = document.querySelector('#tag-to-add');
+    divToAdd.innerHTML = '';
     const feed = state.currentFeed;
     const func = (acc, el, ind) => {
       const newAcc = [...acc, renderFeed(el, ind)];
       return newAcc;
     };
-    const result = feed.items.reduce(func, []);
+    const result = feed.reduce(func, []).join('');
+    const div = document.createElement('div');
+    div.innerHTML = result;
+    divToAdd.appendChild(div);
+  };
+
+  const renderRssTag = () => {
     const div = document.createElement('div');
     div.innerHTML = `
       <div class="row no-gutters">
-        <div  class="col-12">
-          <h2>${feed.title}</h2>
+        <div id="rss-title" class="col-12">
+          <h2></h2>
         </div>
-        <div class="tag-to-add col-12 w-100">
-          ${result.join('')}
+        <div id="tag-to-add" class="col-12 w-100">
         </div>
       </div>`;
     const rssDiv = document.querySelector('#rss');
-    rssDiv.insertBefore(div, rssDiv.firstChild);
+    rssDiv.appendChild(div);
   };
+  renderRssTag();
 
   const addNewFeed = () => {
     const channelTitle = state.newFeed.channel;
@@ -120,6 +128,6 @@ export default () => {
   };
 
   watch(state, 'processState', () => formStateActions[state.processState]());
-  watch(state, 'currentFeed', renderRss);
-  watch(state, 'newFeed', addNewFeed);
+  watch(state, 'currentFeed', renderRssFeeds);
+ // watch(state, 'newFeed', addNewFeed);
 };
