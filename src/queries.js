@@ -36,7 +36,7 @@ export default (url, state) => {
 
   axios.get(url)
     .then(({ data }) => {
-      state.process = 'init';
+      state.processState = 'init';
       const doc = parse(data);
       const title = doc.querySelector('title').textContent;
       const items = [...doc.querySelectorAll('item')];
@@ -47,7 +47,7 @@ export default (url, state) => {
       existTitle = title;
     })
     .catch(() => {
-      state.process = 'error';
+      state.processState = 'error';
     })
     .finally(() => {
       if (link) {

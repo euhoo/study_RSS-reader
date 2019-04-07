@@ -7,11 +7,9 @@ export default () => {
   const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
   const button = document.querySelector('button[type="submit"]');
-  const errorTag = document.querySelector('#danger');
-  const successTag = document.querySelector('#success');
 
   const state = {
-    process: 'init',
+    processState: 'init',
     feedLinks: [],
     feeds: [],
     value: '',
@@ -21,7 +19,21 @@ export default () => {
 
   addListeners(input, state, button);
 
-  const formState = {
+  const addTags = (arr) => {
+    const jumboTag = document.querySelector('#jumbo');
+    arr.forEach((tag) => {
+      const tagName = document.createElement('div');
+      tagName.id = tag;
+      tagName.classList.add('container');
+      jumboTag.appendChild(tagName);
+    });
+  };
+
+  addTags(['loading', 'success', 'danger']);
+  const errorTag = document.querySelector('#danger');
+  const successTag = document.querySelector('#success');
+
+  const formStateActions = {
     init: () => {
       button.removeAttribute('disabled');
       input.classList.add('none');
@@ -60,14 +72,11 @@ export default () => {
         errorTag.innerHTML = '';
       }, 3000);
     },
-
   };
 
   const renderRss = () => {
     const result = [];
     const feed = state.currentFeed;
-    const lengthOfNews = 10;
-    feed.items.length = lengthOfNews;
     feed.items.forEach((item, index) => {
       const rssTag = renderFeed(item, index);
       result.push(rssTag);
@@ -97,14 +106,6 @@ export default () => {
     tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
   };
 
-  const cleaning = (y = 0) => {
-    // eslint-disable-next-line no-param-reassign
-    if (y === 0) successTag.innerHTML = '';
-    button.removeAttribute('disabled');
-    input.classList.add('none');
-    input.classList.remove('is-valid', 'is-invalid');
-    input.removeAttribute('readonly', 'readonly');
-  };
   const makeCleanRssTag = () => {
     document.querySelector('#rss').innerHTML = '';
   };
@@ -121,7 +122,7 @@ export default () => {
     parent.appendChild(div);
   };
 
-  watch(state, 'process', () => formState[state.process]());
+  watch(state, 'processState', () => formStateActions[state.processState]());
   watch(state, 'currentFeed', renderRss);
   watch(state, 'cleaning', makeCleanRssTag);
   watch(state, 'newFeed', addNewFeed);
