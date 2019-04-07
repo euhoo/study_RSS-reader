@@ -75,12 +75,12 @@ export default () => {
   };
 
   const renderRss = () => {
-    const result = [];
     const feed = state.currentFeed;
-    feed.items.forEach((item, index) => {
-      const rssTag = renderFeed(item, index);
-      result.push(rssTag);
-    });
+    const func = (acc, el, ind) => {
+      const newAcc = [...acc, renderFeed(el, ind)];
+      return newAcc;
+    };
+    const result = feed.items.reduce(func, []);
     const div = document.createElement('div');
     div.innerHTML = `
       <div class="row no-gutters">
@@ -106,9 +106,6 @@ export default () => {
     tagToAddFeed.insertBefore(div, tagToAddFeed.firstChild);
   };
 
-  const makeCleanRssTag = () => {
-    document.querySelector('#rss').innerHTML = '';
-  };
   const renderEvents = (event, message) => {
     const parent = document.querySelector(`#${event}`);
     const tag = `
@@ -124,6 +121,5 @@ export default () => {
 
   watch(state, 'processState', () => formStateActions[state.processState]());
   watch(state, 'currentFeed', renderRss);
-  watch(state, 'cleaning', makeCleanRssTag);
   watch(state, 'newFeed', addNewFeed);
 };
