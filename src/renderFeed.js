@@ -1,8 +1,8 @@
-export default (item, index = 123) => {
+export default (item) => {
   const href = item.querySelector('link').textContent;
   const title = item.querySelector('title').textContent;
   const description = item.querySelector('description').textContent;
-  const id = `${index}${Math.random().toString(36).substr(2, 25)}`;
+  const id = Math.random().toString(36).substr(2, 25);
 
   return `
         <li class="row">

@@ -81,10 +81,10 @@ export default () => {
         <div id="tag-to-add" class="col-12 w-100">
         </div>
       </div>`;
-    const divToAddFeeds = document.querySelector('#tag-to-add');
-    const titleToAdd = document.querySelector('#rss-title');
-    divToAddFeeds.innerHTML = state.feeds.reduce((acc, el, ind) => [...acc, renderFeed(el, ind)], []).join('');
-    titleToAdd.innerHTML = state.channelTitles.reduce((acc, el) => [...acc, `<p><strong>${el}</strong></p>`], []).join('');
+    const feedsTag = document.querySelector('#tag-to-add');
+    const titlesTag = document.querySelector('#rss-title');
+    feedsTag.innerHTML = state.feeds.reduce((acc, feed) => [...acc, renderFeed(feed)], []).join('');
+    titlesTag.innerHTML = state.channelTitles.reduce((acc, title) => [...acc, `<p><strong>${title}</strong></p>`], []).join('');
   };
 
   watch(state, 'processState', () => formStateActions[state.processState]());

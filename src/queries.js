@@ -19,7 +19,7 @@ const findNewFeeds = (newFeeds, oldFeeds) => {
 export const updateQuery = (state) => {
   axios.all(state.feedLinks.map(link => axios.get(link)))
     .then((allFeeds) => {
-      const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data).items, ...acc], [])]
+      const newFeeds = allFeeds.reduce((acc, feed) => [parse(feed.data).items, ...acc], [])
         .flat();
       const feedsToAdd = findNewFeeds(newFeeds, state.feeds);
       if (feedsToAdd.length > 0) {
