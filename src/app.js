@@ -95,7 +95,6 @@ export default () => {
 
     const titles = state.channelTitles;
     const titlesToAdd = titles.reduce((acc, el) => [...acc, `<p><strong>${el}</strong></p>`], []).join('');
-    console.log(titlesToAdd);
     const divToAdd = document.querySelector('#tag-to-add');
     const { feeds } = state;
     const result = feeds.reduce((acc, el, ind) => [...acc, renderFeed(el, ind)], []).join('');
