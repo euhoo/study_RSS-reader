@@ -3,20 +3,11 @@ import addListeners from './listeners';
 import renderFeed from './renderFeed';
 import { updateQuery } from './queries';
 
-const addTags = (tags) => {
-  const jumboTag = document.querySelector('#jumbo');
-  tags.forEach((tag) => {
-    const tagName = document.createElement('div');
-    tagName.id = tag;
-    tagName.classList.add('container');
-    jumboTag.appendChild(tagName);
-  });
-};
-
 export default () => {
   const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
   const button = document.querySelector('button[type="submit"]');
+  const eventTag = document.querySelector('#event');
 
   const state = {
     processState: 'init',
@@ -28,21 +19,15 @@ export default () => {
 
   updateQuery(state);
   addListeners(input, state, button);
-  addTags(['loading', 'success', 'danger']);
 
-  const errorTag = document.querySelector('#danger');
-  const successTag = document.querySelector('#success');
+
   const renderEvents = (event, message) => {
-    const parent = document.querySelector(`#${event}`);
-    const tag = `
-      <div class="alert alert-${event} alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-          ${message}
-  </div> `;
-    const div = document.createElement('div');
-    div.innerHTML = tag;
-    parent.appendChild(div);
+    eventTag.innerHTML = `
+    <div class="alert alert-${event} alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span></button>
+        ${message}
+    </div> `;
   };
 
   const formStateActions = {
@@ -51,20 +36,20 @@ export default () => {
       input.classList.add('none');
       input.classList.remove('is-valid', 'is-invalid');
       input.removeAttribute('readonly', 'readonly');
-      successTag.innerHTML = '';
+      eventTag.innerHTML = '';
       input.value = '';
     },
     invalid: () => {
       button.setAttribute('disabled', 'disabled');
       input.classList.remove('is-valid');
       input.classList.add('is-invalid');
-      successTag.innerHTML = '';
+      eventTag.innerHTML = '';
     },
     valid: () => {
       button.removeAttribute('disabled');
       input.classList.remove('is-invalid');
       input.classList.add('is-valid');
-      successTag.innerHTML = '';
+      eventTag.innerHTML = '';
     },
     loading: () => {
       button.setAttribute('disabled', 'disabled');
@@ -78,10 +63,10 @@ export default () => {
       input.classList.add('none');
       input.classList.remove('is-valid', 'is-invalid');
       input.removeAttribute('readonly', 'readonly');
-      successTag.innerHTML = '';
+      eventTag.innerHTML = '';
       renderEvents('danger', 'Error! Address is not RSS or link is not correct!');
       setTimeout(() => {
-        errorTag.innerHTML = '';
+        eventTag.innerHTML = '';
       }, 3000);
     },
   };

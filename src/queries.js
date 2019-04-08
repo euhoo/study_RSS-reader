@@ -27,10 +27,6 @@ export const updateQuery = (state) => {
         state.feeds = [...feedsToAdd, ...state.feeds];
       }
     })
-    .catch(() => {
-      // eslint-disable-next-line no-param-reassign
-      state.processState = 'error';
-    })
     .finally(() => {
       setInterval(() => {
         updateQuery(state);
