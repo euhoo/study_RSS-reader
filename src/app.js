@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
 import renderFeed from './renderFeed';
@@ -18,9 +17,9 @@ export default () => {
 
   addListeners(input, state, button);
 
-  const addTags = (arr) => {
+  const addTags = (tags) => {
     const jumboTag = document.querySelector('#jumbo');
-    arr.forEach((tag) => {
+    tags.forEach((tag) => {
       const tagName = document.createElement('div');
       tagName.id = tag;
       tagName.classList.add('container');
@@ -31,6 +30,18 @@ export default () => {
   addTags(['loading', 'success', 'danger']);
   const errorTag = document.querySelector('#danger');
   const successTag = document.querySelector('#success');
+  const renderEvents = (event, message) => {
+    const parent = document.querySelector(`#${event}`);
+    const tag = `
+      <div class="alert alert-${event} alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span></button>
+          ${message}
+  </div> `;
+    const div = document.createElement('div');
+    div.innerHTML = tag;
+    parent.appendChild(div);
+  };
 
   const formStateActions = {
     init: () => {
@@ -73,54 +84,26 @@ export default () => {
     },
   };
   const renderRssFeeds = () => {
-    const divToAdd = document.querySelector('#tag-to-add');
-    divToAdd.innerHTML = '';
-    const feed = state.feeds;
-    const func = (acc, el, ind) => {
-      const newAcc = [...acc, renderFeed(el, ind)];
-      return newAcc;
-    };
-    const result = feed.reduce(func, []).join('');
-    const div = document.createElement('div');
-    div.innerHTML = result;
-    divToAdd.insertBefore(div, divToAdd.firstChild);
-  };
-
-  const renderRssTag = () => {
-    const div = document.createElement('div');
-    div.innerHTML = `
+    const rssDiv = document.querySelector('#rss');
+    // rssDiv.innerHTML = '';
+    rssDiv.innerHTML = `
       <div class="row no-gutters">
         <div id="rss-title" class="col-12">
         </div>
         <div id="tag-to-add" class="col-12 w-100">
         </div>
       </div>`;
-    const rssDiv = document.querySelector('#rss');
-    rssDiv.appendChild(div);
-  };
-  renderRssTag();
 
-  const renderEvents = (event, message) => {
-    const parent = document.querySelector(`#${event}`);
-    const tag = `
-      <div class="alert alert-${event} alert-dismissible" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-          ${message}
-  </div> `;
-    const div = document.createElement('div');
-    div.innerHTML = tag;
-    parent.appendChild(div);
+    const titles = state.channelTitles;
+    const titlesToAdd = titles.reduce((acc, el) => [...acc, `<p><strong>${el}</strong></p>`], []).join('');
+    console.log(titlesToAdd);
+    const divToAdd = document.querySelector('#tag-to-add');
+    const { feeds } = state;
+    const result = feeds.reduce((acc, el, ind) => [...acc, renderFeed(el, ind)], []).join('');
+    divToAdd.innerHTML = result;
+    const titleTag = document.querySelector('#rss-title');
+    titleTag.innerHTML = titlesToAdd;
   };
-
-  const renderTitles = () => {
-    const rssTitle = document.querySelector('#rss-title');
-    const title = document.createElement('p');
-    title.innerHTML = `<strong>${state.channelTitles[0]}</strong>`;
-    rssTitle.appendChild(title);
-  };
-
   watch(state, 'processState', () => formStateActions[state.processState]());
   watch(state, 'feeds', renderRssFeeds);
-  watch(state, 'channelTitles', renderTitles);
 };

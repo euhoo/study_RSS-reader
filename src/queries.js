@@ -1,10 +1,12 @@
-/* eslint-disable no-param-reassign */
 import axios from 'axios';
 import { difference } from 'lodash';
 
 const parse = (data) => {
   const parser = new DOMParser();
-  return parser.parseFromString(data, 'application/xml');
+  const doc = parser.parseFromString(data, 'application/xml');
+  const title = doc.querySelector('title').textContent;
+  const items = [...doc.querySelectorAll('item')];
+  return { title, items };
 };
 
 const findNewFeeds = (newFeeds, oldFeeds) => {
@@ -17,15 +19,16 @@ const findNewFeeds = (newFeeds, oldFeeds) => {
 const updateQuery = (state) => {
   axios.all(state.feedLinks.map(link => axios.get(link)))
     .then((allFeeds) => {
-      const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data), ...acc], [])]
-        .map(doc => [...doc.querySelectorAll('item')])
+      const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data).items, ...acc], [])]
         .flat();
       const feedsToAdd = findNewFeeds(newFeeds, state.feeds);
       if (feedsToAdd.length > 0) {
+        // eslint-disable-next-line no-param-reassign
         state.feeds = [...feedsToAdd, ...state.feeds];
       }
     })
     .catch(() => {
+      // eslint-disable-next-line no-param-reassign
       state.processState = 'error';
     });
 };
@@ -33,16 +36,20 @@ export default (url, state) => {
   let link;
   axios.get(url)
     .then(({ data }) => {
+      // eslint-disable-next-line no-param-reassign
       state.processState = 'init';
       const doc = parse(data);
-      const title = doc.querySelector('title').textContent;
-      const items = [...doc.querySelectorAll('item')];
+      const { title, items } = doc;
+      // eslint-disable-next-line no-param-reassign
       state.channelTitles = [title, ...state.channelTitles];
+      // eslint-disable-next-line no-param-reassign
       state.feedLinks = [...state.feedLinks, url];
+      // eslint-disable-next-line no-param-reassign
       state.feeds = [...items, ...state.feeds];
       link = url;
     })
     .catch(() => {
+      // eslint-disable-next-line no-param-reassign
       state.processState = 'error';
     })
     .finally(() => {
