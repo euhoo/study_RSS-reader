@@ -2,6 +2,16 @@ import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
 import renderFeed from './renderFeed';
 
+const addTags = (tags) => {
+  const jumboTag = document.querySelector('#jumbo');
+  tags.forEach((tag) => {
+    const tagName = document.createElement('div');
+    tagName.id = tag;
+    tagName.classList.add('container');
+    jumboTag.appendChild(tagName);
+  });
+};
+
 export default () => {
   const { watch } = WatchJS;
   const input = document.querySelector('#main-input');
@@ -16,18 +26,8 @@ export default () => {
   };
 
   addListeners(input, state, button);
-
-  const addTags = (tags) => {
-    const jumboTag = document.querySelector('#jumbo');
-    tags.forEach((tag) => {
-      const tagName = document.createElement('div');
-      tagName.id = tag;
-      tagName.classList.add('container');
-      jumboTag.appendChild(tagName);
-    });
-  };
-
   addTags(['loading', 'success', 'danger']);
+
   const errorTag = document.querySelector('#danger');
   const successTag = document.querySelector('#success');
   const renderEvents = (event, message) => {
@@ -85,7 +85,6 @@ export default () => {
   };
   const renderRssFeeds = () => {
     const rssDiv = document.querySelector('#rss');
-    // rssDiv.innerHTML = '';
     rssDiv.innerHTML = `
       <div class="row no-gutters">
         <div id="rss-title" class="col-12">
