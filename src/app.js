@@ -19,35 +19,32 @@ export default () => {
 
   const formStateActions = {
     init: () => {
-      button.removeAttribute('disabled');
-      input.classList.add('none');
+      button.disabled = false;
       input.classList.remove('is-valid', 'is-invalid');
       input.removeAttribute('readonly', 'readonly');
       eventTag.innerHTML = '';
       input.value = '';
     },
     invalid: () => {
-      button.setAttribute('disabled', 'disabled');
+      button.disabled = true;
       input.classList.remove('is-valid');
       input.classList.add('is-invalid');
       eventTag.innerHTML = '';
     },
     valid: () => {
-      button.removeAttribute('disabled');
+      button.disabled = false;
       input.classList.remove('is-invalid');
       input.classList.add('is-valid');
       eventTag.innerHTML = '';
     },
     loading: () => {
-      button.setAttribute('disabled', 'disabled');
+      button.disabled = true;
       input.classList.remove('is-valid', 'is-invalid');
-      input.classList.add('none');
       input.setAttribute('readonly', 'readonly');
       renderEvents('success', 'Loading...', eventTag);
     },
     error: () => {
-      button.removeAttribute('disabled');
-      input.classList.add('none');
+      button.disabled = false;
       input.classList.remove('is-valid', 'is-invalid');
       input.removeAttribute('readonly', 'readonly');
       eventTag.innerHTML = '';
