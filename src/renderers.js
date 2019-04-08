@@ -1,4 +1,4 @@
-export default (item) => {
+const renderFeed = (item) => {
   const href = item.querySelector('link').textContent;
   const title = item.querySelector('title').textContent;
   const description = item.querySelector('description').textContent;
@@ -35,4 +35,28 @@ export default (item) => {
               </div>
             </div>
           </div>`;
+};
+export const renderEvents = (event, message, tag) => {
+  // eslint-disable-next-line no-param-reassign
+  tag.innerHTML = `
+  <div class="alert alert-${event} alert-dismissible" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span></button>
+      ${message}
+  </div> `;
+};
+
+export const renderAllFeeds = (state) => {
+  const rssDiv = document.querySelector('#rss');
+  rssDiv.innerHTML = `
+    <div class="row no-gutters">
+      <div id="rss-title" class="col-12">
+      </div>
+      <div id="tag-to-add" class="col-12 w-100">
+      </div>
+    </div>`;
+  const feedsTag = document.querySelector('#tag-to-add');
+  const titlesTag = document.querySelector('#rss-title');
+  feedsTag.innerHTML = state.feeds.reduce((acc, feed) => [...acc, renderFeed(feed)], []).join('');
+  titlesTag.innerHTML = state.channelTitles.reduce((acc, title) => [...acc, `<p><strong>${title}</strong></p>`], []).join('');
 };

@@ -1,6 +1,6 @@
 import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
-import renderFeed from './renderFeed';
+import { renderAllFeeds, renderEvents } from './renderers';
 import { updateQuery } from './queries';
 
 export default () => {
@@ -15,19 +15,6 @@ export default () => {
     feedLinks: [],
     feeds: [],
     channelTitles: [],
-  };
-
-  updateQuery(state);
-  addListeners(input, state, button);
-
-
-  const renderEvents = (event, message) => {
-    eventTag.innerHTML = `
-    <div class="alert alert-${event} alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span></button>
-        ${message}
-    </div> `;
   };
 
   const formStateActions = {
@@ -56,7 +43,7 @@ export default () => {
       input.classList.remove('is-valid', 'is-invalid');
       input.classList.add('none');
       input.setAttribute('readonly', 'readonly');
-      renderEvents('success', 'Loading...');
+      renderEvents('success', 'Loading...', eventTag);
     },
     error: () => {
       button.removeAttribute('disabled');
@@ -64,29 +51,16 @@ export default () => {
       input.classList.remove('is-valid', 'is-invalid');
       input.removeAttribute('readonly', 'readonly');
       eventTag.innerHTML = '';
-      renderEvents('danger', 'Error! Address is not RSS or link is not correct!');
+      renderEvents('danger', 'Error! Address is not RSS or link is not correct!', eventTag);
       setTimeout(() => {
         eventTag.innerHTML = '';
       }, 3000);
     },
   };
 
-
-  const renderRssFeeds = () => {
-    const rssDiv = document.querySelector('#rss');
-    rssDiv.innerHTML = `
-      <div class="row no-gutters">
-        <div id="rss-title" class="col-12">
-        </div>
-        <div id="tag-to-add" class="col-12 w-100">
-        </div>
-      </div>`;
-    const feedsTag = document.querySelector('#tag-to-add');
-    const titlesTag = document.querySelector('#rss-title');
-    feedsTag.innerHTML = state.feeds.reduce((acc, feed) => [...acc, renderFeed(feed)], []).join('');
-    titlesTag.innerHTML = state.channelTitles.reduce((acc, title) => [...acc, `<p><strong>${title}</strong></p>`], []).join('');
-  };
+  updateQuery(state);
+  addListeners(input, state, button);
 
   watch(state, 'processState', () => formStateActions[state.processState]());
-  watch(state, 'feeds', renderRssFeeds);
+  watch(state, 'feeds', () => renderAllFeeds(state));
 };
