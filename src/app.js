@@ -1,6 +1,7 @@
 import WatchJS from 'melanke-watchjs';
 import addListeners from './listeners';
 import renderFeed from './renderFeed';
+import { updateQuery } from './queries';
 
 const addTags = (tags) => {
   const jumboTag = document.querySelector('#jumbo');
@@ -25,6 +26,7 @@ export default () => {
     channelTitles: [],
   };
 
+  updateQuery(state);
   addListeners(input, state, button);
   addTags(['loading', 'success', 'danger']);
 
@@ -83,6 +85,8 @@ export default () => {
       }, 3000);
     },
   };
+
+
   const renderRssFeeds = () => {
     const rssDiv = document.querySelector('#rss');
     rssDiv.innerHTML = `
@@ -92,16 +96,12 @@ export default () => {
         <div id="tag-to-add" class="col-12 w-100">
         </div>
       </div>`;
-
-    const titles = state.channelTitles;
-    const titlesToAdd = titles.reduce((acc, el) => [...acc, `<p><strong>${el}</strong></p>`], []).join('');
-    const divToAdd = document.querySelector('#tag-to-add');
-    const { feeds } = state;
-    const result = feeds.reduce((acc, el, ind) => [...acc, renderFeed(el, ind)], []).join('');
-    divToAdd.innerHTML = result;
-    const titleTag = document.querySelector('#rss-title');
-    titleTag.innerHTML = titlesToAdd;
+    const divToAddFeeds = document.querySelector('#tag-to-add');
+    const titleToAdd = document.querySelector('#rss-title');
+    divToAddFeeds.innerHTML = state.feeds.reduce((acc, el, ind) => [...acc, renderFeed(el, ind)], []).join('');
+    titleToAdd.innerHTML = state.channelTitles.reduce((acc, el) => [...acc, `<p><strong>${el}</strong></p>`], []).join('');
   };
+
   watch(state, 'processState', () => formStateActions[state.processState]());
   watch(state, 'feeds', renderRssFeeds);
 };

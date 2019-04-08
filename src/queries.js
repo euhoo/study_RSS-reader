@@ -16,7 +16,7 @@ const findNewFeeds = (newFeeds, oldFeeds) => {
   return newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
 };
 
-const updateQuery = (state) => {
+export const updateQuery = (state) => {
   axios.all(state.feedLinks.map(link => axios.get(link)))
     .then((allFeeds) => {
       const newFeeds = [...allFeeds.reduce((acc, feed) => [parse(feed.data).items, ...acc], [])]
@@ -30,10 +30,15 @@ const updateQuery = (state) => {
     .catch(() => {
       // eslint-disable-next-line no-param-reassign
       state.processState = 'error';
+    })
+    .finally(() => {
+      setInterval(() => {
+        updateQuery(state);
+      }, 5000);
     });
 };
+
 export default (url, state) => {
-  let link;
   axios.get(url)
     .then(({ data }) => {
       // eslint-disable-next-line no-param-reassign
@@ -46,17 +51,9 @@ export default (url, state) => {
       state.feedLinks = [...state.feedLinks, url];
       // eslint-disable-next-line no-param-reassign
       state.feeds = [...items, ...state.feeds];
-      link = url;
     })
     .catch(() => {
       // eslint-disable-next-line no-param-reassign
       state.processState = 'error';
-    })
-    .finally(() => {
-      if (link) {
-        setInterval(() => {
-          updateQuery(state);
-        }, 5000);
-      }
     });
 };
