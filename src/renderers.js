@@ -1,14 +1,17 @@
-const renderFeed = (item) => {
-  const href = item.querySelector('link').textContent;
-  const title = item.querySelector('title').textContent;
-  const description = item.querySelector('description').textContent;
+const renderFeed = (feed) => {
+  // const { href } = item.href;
+
+  const { href, feedTitle, description } = feed;
+  // const href = item.querySelector('link').textContent;
+  // const title = item.querySelector('title').textContent;
+  // const description = item.querySelector('description').textContent;
   const id = Math.random().toString(36).substr(2, 25);
 
   return `
         <li class="row">
           <div class="col-12 col-xs-12 col-sm-10 col-md-9 col-lg-10">
           <a href="${href}" class="text-dark .bg-light btn-block">
-            ${title}
+            ${feedTitle}
           </a>
           </div>
           <div class="col-12 col-xs-12 col-sm-2 col-md-3 col-lg-2">
@@ -23,7 +26,7 @@ const renderFeed = (item) => {
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="modalWindowLabel${id}">
-                    ${title}
+                    ${feedTitle}
                   </h5>
                   <button class="close" type="button" data-dismiss="modal" aria-label="close">
                     <span aria-hidden="true">&times;</span>
@@ -57,6 +60,6 @@ export const renderAllFeeds = (state) => {
     </div>`;
   const feedsTag = document.querySelector('#tag-to-add');
   const titlesTag = document.querySelector('#rss-title');
-  feedsTag.innerHTML = state.feeds.reduce((acc, feed) => [...acc, renderFeed(feed)], []).join('');
-  titlesTag.innerHTML = state.channelTitles.reduce((acc, title) => [...acc, `<p><strong>${title}</strong></p>`], []).join('');
+  feedsTag.innerHTML = state.feeds.map(feed => renderFeed(feed)).join('');
+  titlesTag.innerHTML = state.channelTitles.map(title => `<p><strong>${title}</strong></p>`).join('');
 };

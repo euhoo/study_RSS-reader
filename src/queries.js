@@ -6,20 +6,28 @@ const parse = (data) => {
   const doc = parser.parseFromString(data, 'application/xml');
   const title = doc.querySelector('title').textContent;
   const items = [...doc.querySelectorAll('item')];
-  return { title, items };
+  const feeds = items.map((item) => {
+    const href = item.querySelector('link').textContent;
+    const feedTitle = item.querySelector('title').textContent;
+    const description = item.querySelector('description').textContent;
+    const feed = { href, feedTitle, description };
+    return feed;
+  });
+  return { title, feeds };
 };
 
 const findNewFeeds = (newFeeds, oldFeeds) => {
-  const newFeedsLinks = newFeeds.map(feed => feed.querySelector('link').textContent);
-  const OldFeedsLinks = oldFeeds.map(feed => feed.querySelector('link').textContent);
+  const newFeedsLinks = newFeeds.map(feed => feed.href);
+  const OldFeedsLinks = oldFeeds.map(feed => feed.href);
   const diff = difference(newFeedsLinks, OldFeedsLinks);
-  return newFeeds.filter(item => diff.includes(item.querySelector('link').textContent));
+  return newFeeds.filter(feed => diff.includes(feed.href));
 };
 
 export const updateQuery = (state) => {
-  axios.all(state.feedLinks.map(link => axios.get(link)))
-    .then((allFeeds) => {
-      const newFeeds = allFeeds.reduce((acc, feed) => [parse(feed.data).items, ...acc], [])
+  const promises = state.feedLinks.map(link => axios.get(link));
+  axios.all(promises)
+    .then((allRssChannels) => {
+      const newFeeds = allRssChannels.map(channel => parse(channel.data).feeds)
         .flat();
       const feedsToAdd = findNewFeeds(newFeeds, state.feeds);
       if (feedsToAdd.length > 0) {
@@ -40,13 +48,13 @@ export default (url, state) => {
       // eslint-disable-next-line no-param-reassign
       state.processState = 'init';
       const doc = parse(data);
-      const { title, items } = doc;
+      const { title, feeds } = doc;
       // eslint-disable-next-line no-param-reassign
       state.channelTitles = [title, ...state.channelTitles];
       // eslint-disable-next-line no-param-reassign
       state.feedLinks = [...state.feedLinks, url];
       // eslint-disable-next-line no-param-reassign
-      state.feeds = [...items, ...state.feeds];
+      state.feeds = [...feeds, ...state.feeds];
     })
     .catch(() => {
       // eslint-disable-next-line no-param-reassign
