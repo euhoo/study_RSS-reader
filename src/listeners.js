@@ -7,12 +7,18 @@ export default (input, state, button) => {
   input.addEventListener('input', ({ target }) => {
     // eslint-disable-next-line no-param-reassign
     state.value = target.value;
+    if (state.value.length === 0) {
+      // eslint-disable-next-line no-param-reassign
+      state.processState = 'init';
+      return;
+    }
+    if (!isURL(state.value)) {
     // eslint-disable-next-line no-param-reassign
-    if (state.value.length === 0) state.processState = 'init';
+      state.processState = 'invalid';
+      return;
+    }
     // eslint-disable-next-line no-param-reassign
-    if (state.value.length !== 0 && isURL(state.value)) state.processState = 'valid';
-    // eslint-disable-next-line no-param-reassign
-    if (state.value.length !== 0 && !isURL(state.value)) state.processState = 'invalid';
+    state.processState = 'valid';
   });
 
   button.addEventListener('click', () => {
