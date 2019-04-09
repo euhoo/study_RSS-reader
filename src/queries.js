@@ -7,10 +7,13 @@ const parse = (data) => {
   const title = doc.querySelector('title').textContent;
   const items = [...doc.querySelectorAll('item')];
   const feeds = items.map((item) => {
+    const id = Math.random().toString(36).substr(2, 25);
     const href = item.querySelector('link').textContent;
     const feedTitle = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
-    const feed = { href, feedTitle, description };
+    const feed = {
+      href, feedTitle, description, id,
+    };
     return feed;
   });
   return { title, feeds };

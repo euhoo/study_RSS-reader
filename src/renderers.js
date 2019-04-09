@@ -1,12 +1,7 @@
 const renderFeed = (feed) => {
-  // const { href } = item.href;
-
-  const { href, feedTitle, description } = feed;
-  // const href = item.querySelector('link').textContent;
-  // const title = item.querySelector('title').textContent;
-  // const description = item.querySelector('description').textContent;
-  const id = Math.random().toString(36).substr(2, 25);
-
+  const {
+    href, feedTitle, description, id,
+  } = feed;
   return `
         <li class="row">
           <div class="col-12 col-xs-12 col-sm-10 col-md-9 col-lg-10">
