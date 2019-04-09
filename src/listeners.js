@@ -20,8 +20,8 @@ export default (input, state, button) => {
     state.processState = 'loading';
     const link = state.value;
     const url = `${cors}${link}`;
-    const filtered = state.feedLinks.find(item => item === url);
-    if (!filtered) feedQuery(url, state);
+    const filteredLinks = state.feedLinks.filter(item => item === url);
+    if (filteredLinks.length > 0) feedQuery(url, state);
     else {
       // eslint-disable-next-line no-param-reassign
       state.processState = 'init';
