@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { differenceBy, random } from 'lodash';
+import { differenceBy, uniqueId } from 'lodash';
 
 const parse = (data) => {
   const parser = new DOMParser();
@@ -7,7 +7,7 @@ const parse = (data) => {
   const title = doc.querySelector('title').textContent;
   const items = [...doc.querySelectorAll('item')];
   const feeds = items.map((item) => {
-    const id = random(1, 1000000);
+    const id = uniqueId();
     const href = item.querySelector('link').textContent;
     const feedTitle = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
