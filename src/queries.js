@@ -20,7 +20,7 @@ const parse = (data) => {
 };
 
 export const updateQuery = (state) => {
-  const promises = state.feedLinks.map(link => axios.get(link));
+  const promises = state.feedLinks.map(axios.get);
   axios.all(promises)
     .then((allRssChannels) => {
       const newFeeds = allRssChannels.map(channel => parse(channel.data).feeds)
